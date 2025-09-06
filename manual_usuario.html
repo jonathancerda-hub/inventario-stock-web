@@ -80,7 +80,7 @@
         }
 
         .main-content {
-            margin-left: 250px;
+            margin-left: 270px;
             flex-grow: 1;
             padding: 30px 40px;
             overflow-y: auto;
@@ -161,6 +161,7 @@
         .status-vence-pronto { background-color: #E53935; }
         .status-advertencia { background-color: #F7CA18; }
         .status-ok { background-color: #7AC143; }
+        .status-largo-plazo { background-color: #42A5F5; }
 
     </style>
 </head>
@@ -173,8 +174,9 @@
                     <li><a href="#introduccion" class="active">1. Introducción</a></li>
                     <li><a href="#acceso">2. Acceso e Inicio de Sesión</a></li>
                     <li><a href="#inventario">3. Página de Inventario</a></li>
-                    <li><a href="#dashboard">4. Dashboard</a></li>
-                    <li><a href="#logout">5. Cerrar Sesión</a></li>
+                    <li><a href="#exportacion">4. Página de Exportación</a></li>
+                    <li><a href="#dashboard">5. Dashboard</a></li>
+                    <li><a href="#logout">6. Cerrar Sesión</a></li>
                 </ul>
             </nav>
         </aside>
@@ -202,7 +204,7 @@
                     <p>Para comenzar a usar la aplicación, sigue estos pasos:</p>
                     <ol>
                         <li><strong>Abrir la Aplicación:</strong> Accede a la aplicación a través de la URL proporcionada por tu administrador.</li>
-                        <li><strong>Iniciar Sesión:</strong> Serás recibido por una pantalla de inicio de sesión. Ingresa tu <strong>correo electrónico</strong> y <strong>contraseña</strong> de Odoo en los campos correspondientes y haz clic en el botón "Log in".</li>
+                        <li><strong>Iniciar Sesión:</strong> Serás recibido por una pantalla de inicio de sesión. Ingresa tu <strong>nombre de usuario</strong> y <strong>contraseña</strong> de Odoo en los campos correspondientes y haz clic en el botón "Log in".</li>
                     </ol>
                     <p>Si las credenciales son correctas, serás redirigido a la página principal de "Inventario de Stock".</p>
                 </div>
@@ -223,35 +225,41 @@
                     </ul>
                     <p>Después de seleccionar tus filtros, haz clic en el botón <strong>"Buscar"</strong>. Para eliminar todos los filtros y ver el inventario completo, haz clic en <strong>"Limpiar"</strong>.</p>
                     
-                    <h4>3.2. Entender la Tabla de Inventario</h4>
-                    <p>La columna "Meses Expira" está codificada por colores para una rápida identificación del estado del stock:</p>
-                     <ul>
-                        <li><span class="color-box status-vence-pronto"></span><strong>Rojo (0-3 meses):</strong> Vencimiento crítico.</li>
-                        <li><span class="color-box status-advertencia"></span><strong>Amarillo (4-7 meses):</strong> Advertencia de vencimiento.</li>
-                        <li><span class="color-box status-ok"></span><strong>Verde (8-12 meses):</strong> Stock en buen estado.</li>
-                    </ul>
+                    <h4>3.2. Exportar a Excel</h4>
+                    <p>Puedes exportar la vista actual de la tabla de inventario a un archivo de Excel. Simplemente haz clic en el botón <strong>"Exportar a Excel"</strong> y se descargará un archivo con los datos que estás visualizando.</p>
+                </div>
+            </section>
+
+            <section id="exportacion" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-file-earmark-spreadsheet"></i>4. Página de Exportación</h3>
+                </div>
+                <div class="card-body">
+                    <p>Esta página está diseñada para exportaciones de inventario más específicas. Puedes acceder a ella desde el menú de navegación.</p>
+                    <h4>4.1. Filtrar y Exportar</h4>
+                    <p>Utiliza los filtros disponibles (Término de búsqueda, Grupo de Artículo, Línea Comercial) para acotar los datos que deseas exportar. Luego, haz clic en el botón <strong>"Exportar a Excel"</strong> para generar y descargar el archivo.</p>
                 </div>
             </section>
 
             <section id="dashboard" class="card">
                 <div class="card-header">
-                    <h3><i class="bi bi-bar-chart-line"></i>4. Dashboard de Inventario</h3>
+                    <h3><i class="bi bi-bar-chart-line"></i>5. Dashboard de Inventario</h3>
                 </div>
                 <div class="card-body">
-                    <p>Para acceder a una vista gráfica y resumida del inventario, haz clic en el botón <strong>"Ver Dashboard"</strong> en la esquina superior derecha.</p>
-                    <p>El dashboard contiene varios gráficos interactivos que te permiten entender el estado de tu inventario de un solo vistazo. Puedes hacer clic en cualquier sección de los gráficos (una barra, una porción del pastel, etc.) para ser redirigido a la tabla de inventario, que se filtrará automáticamente para mostrarte solo los datos correspondientes a tu selección.</p>
-                    
-                    <h4>4.1. Capturar y Exportar el Dashboard</h4>
-                     <ul>
-                        <li><strong>Botón "Capturar":</strong> Al hacer clic en este botón, se generará un archivo <strong>PDF</strong> con una captura de pantalla de la vista actual del dashboard, ideal para compartir en informes.</li>
-                        <li><strong>Botón "Volver al Inventario":</strong> Te permite regresar a la vista de tabla de inventario.</li>
+                    <p>Para acceder a una vista gráfica y resumida del inventario, haz clic en el enlace <strong>"Dashboard"</strong> en el menú de navegación.</p>
+                    <p>El dashboard contiene varios gráficos interactivos que te permiten entender el estado de tu inventario de un solo vistazo. Puedes filtrar los datos del dashboard por:</p>
+                    <ul>
+                        <li><strong>Categoría</strong></li>
+                        <li><strong>Línea Comercial</strong></li>
+                        <li><strong>Lugar</strong></li>
                     </ul>
+                    <p>Haz clic en el botón <strong>"Filtrar"</strong> para aplicar los filtros seleccionados. Para volver a la vista de tabla, utiliza el enlace <strong>"Inventario"</strong> del menú.</p>
                 </div>
             </section>
 
             <section id="logout" class="card">
                 <div class="card-header">
-                    <h3><i class="bi bi-box-arrow-left"></i>5. Cerrar Sesión</h3>
+                    <h3><i class="bi bi-box-arrow-left"></i>6. Cerrar Sesión</h3>
                 </div>
                 <div class="card-body">
                     <p>Para salir de la aplicación de forma segura, haz clic en el botón <strong>"Cerrar Sesión"</strong> ubicado en la esquina superior derecha. Serás redirigido a la pantalla de inicio de sesión.</p>
