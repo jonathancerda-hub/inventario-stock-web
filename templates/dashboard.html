@@ -707,6 +707,37 @@
             };
             expByLineChart.setOption(option);
             window.addEventListener('resize', () => { expByLineChart.resize(); });
+            // Al hacer click en una barra, ir a inventory filtrado por la línea y por exp_status 0-3
+            expByLineChart.on('click', function(params) {
+                const label = params.name;
+                // Intentar encontrar el id de la línea por su texto en el select de líneas
+                let lineaId = null;
+                const lineaSelectEl = document.getElementById('linea_id');
+                if (lineaSelectEl) {
+                    const opts = lineaSelectEl.querySelectorAll('option');
+                    for (let i = 0; i < opts.length; i++) {
+                        const opt = opts[i];
+                        if (opt.textContent.trim() === String(label).trim()) {
+                            lineaId = opt.value;
+                            break;
+                        }
+                    }
+                }
+                const url = new URL("{{ url_for('inventory', _external=True) }}");
+                if (lineaId) { url.searchParams.set('linea_id', lineaId); }
+                // Este gráfico representa 0-3 meses
+                url.searchParams.set('exp_status', '0-3');
+                // Mantener filtro de categoría y lugar si existen
+                try {
+                    const categoryId = JSON.parse(document.getElementById('selected-category-id').textContent);
+                    const lugarId = JSON.parse(document.getElementById('selected-lugar-id').textContent);
+                    if (categoryId) { url.searchParams.set('grupo_id', categoryId); }
+                    if (lugarId) { url.searchParams.set('lugar_id', lugarId); }
+                } catch (e) {
+                    // ignore
+                }
+                window.location.href = url.toString();
+            });
         }
     });
 </script>
