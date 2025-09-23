@@ -13,7 +13,8 @@
         <div id="datetime" style="font-size: 0.5em; color: #888; font-weight: normal; margin-top: 8px;"></div>
         <div id="last-update" style="font-size: 0.4em; color: #666; font-weight: normal; margin-top: 4px;">Última actualización: --</div>
     </h1>
-    <div style="font-size: 0.95em; color: #888; margin-bottom: 8px;">
+    <h3 class="page-greeting" style="font-size:0.95em; color:#444; margin-top:6px;">Hola, {{ session.get('username') }}</h3>
+    <div style="display: none; font-size: 0.95em; color: #888; margin-bottom: 8px; text-align:center;">
         Tiempo de respuesta backend: {{ backend_time }}
     </div>
     <div style="display: flex; gap: var(--space-2);">
@@ -89,6 +90,22 @@
     </div>
 
     <div class="grid-container" style="display: flex; gap: 24px; margin-top: 32px;">
+        <!-- Gráfico de Pastel -->
+        <div class="chart-container rounded-card" style="flex: 1; min-width: 0; padding-bottom: 110px;">
+            <h2 class="chart-title">Inventario por Estado de Vencimiento</h2>
+            <div id="expirationChart" style="height: 300px; width: 100%;"></div>
+        </div>
+        <!-- Gráfico de Barras Horizontales -->
+        <div class="chart-container rounded-card" style="flex: 1; min-width: 0;">
+            <h2 class="chart-title">Unidades por Vencer (0-3 Meses) por Línea Comercial</h2>
+            <div class="chart-wrapper" style="height: 300px;">
+                <div id="expiringByLineChart" style="height: 100%; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="grid-container" style="display: flex; gap: 24px;">
         <!-- Gráfico de Barras Verticales por Línea Comercial -->
         <div class="chart-container rounded-card" style="flex: 1; min-width: 0;">
             <h2 class="chart-title">Stock por Línea Comercial</h2>
@@ -101,22 +118,6 @@
             <h2 class="chart-title">Stock por Categoría</h2>
             <div class="chart-wrapper" style="height: 220px;">
                 <canvas id="stockByCategoryChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="grid-container" style="display: flex; gap: 24px;">
-        <!-- Gráfico de Pastel -->
-        <div class="chart-container rounded-card" style="flex: 1; min-width: 0; padding-bottom: 110px;">
-            <h2 class="chart-title">Inventario por Estado de Vencimiento</h2>
-            <div id="expirationChart" style="height: 300px; width: 100%;"></div>
-        </div>
-        <!-- Gráfico de Barras Horizontales -->
-        <div class="chart-container rounded-card" style="flex: 1; min-width: 0;">
-            <h2 class="chart-title">Unidades por Vencer (0-3 Meses) por Línea Comercial</h2>
-        <div class="chart-wrapper" style="height: 300px;">
-                <div id="expiringByLineChart" style="height: 100%; width: 100%;"></div>
             </div>
         </div>
     </div>
@@ -624,13 +625,7 @@
                     subtextStyle: { fontSize: 14 }
                 },
                 tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-                legend: {
-                    orient: 'horizontal',
-                    left: 'center',
-                    bottom: -50,
-                    itemGap: 32,
-                    textStyle: { fontSize: 14 }
-                },
+                legend: { show: false },
                 series: [{
                     name: 'Estado de Vencimiento',
                     type: 'pie',

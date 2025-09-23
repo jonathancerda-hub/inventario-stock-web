@@ -212,7 +212,15 @@ def inventory_export():
         selected_filters=selected_filters
     )
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def index():
+    # Mostrar el dashboard como página principal si hay sesión, sino ir a login
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+
+@app.route('/inventory', methods=['GET', 'POST'])
 def inventory():
     if 'username' not in session:
         return redirect(url_for('login'))
