@@ -5,6 +5,9 @@ __pycache__/
 # Archivo de variables de entorno locales
 .env
 
+# Lista blanca de usuarios (contiene información sensible)
+whitelist.txt
+
 # Otros archivos específicos del sistema operativo o IDE
 .DS_Store
 *.pyc

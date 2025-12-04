@@ -18,6 +18,13 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        
+        # Verificar primero si el usuario está en la lista blanca
+        if not data_manager.is_user_authorized(username):
+            flash('Acceso denegado. Usuario no autorizado para este sistema.', 'danger')
+            return render_template('login.html')
+        
+        # Si está autorizado, verificar credenciales
         if data_manager.authenticate_user(username, password):
             session['username'] = username
             flash('¡Inicio de sesión exitoso!', 'success')

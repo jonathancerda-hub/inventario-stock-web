@@ -167,6 +167,7 @@ class OdooManager:
         self.uid = None
         self.models = None
         self.is_connected = False
+        self.whitelist = self._load_whitelist()
         try:
             common_url = f'{self.url}/xmlrpc/2/common'
             models_url = f'{self.url}/xmlrpc/2/object'
@@ -181,14 +182,49 @@ class OdooManager:
         except Exception as e:
             print(f"Error en la conexión principal a Odoo: {e}")
 
+    def _load_whitelist(self):
+        """Carga la lista blanca de usuarios autorizados desde whitelist.txt"""
+        whitelist_path = os.path.join(os.path.dirname(__file__), 'whitelist.txt')
+        whitelist = set()
+        try:
+            if os.path.exists(whitelist_path):
+                with open(whitelist_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        # Ignorar líneas vacías y comentarios
+                        if line and not line.startswith('#'):
+                            whitelist.add(line.lower())
+                print(f"Lista blanca cargada: {len(whitelist)} usuarios autorizados")
+            else:
+                print("⚠️ Advertencia: archivo whitelist.txt no encontrado. Todos los usuarios con credenciales válidas tendrán acceso.")
+        except Exception as e:
+            print(f"Error cargando whitelist: {e}")
+        return whitelist
+
+    def is_user_authorized(self, username):
+        """Verifica si un usuario está en la lista blanca"""
+        if not self.whitelist:
+            # Si no hay whitelist, permitir acceso (modo sin restricción)
+            return True
+        return username.lower() in self.whitelist
+
     def authenticate_user(self, username, password):
         if not self.is_connected: return False
+        
+        # Verificar primero si el usuario está en la lista blanca
+        if not self.is_user_authorized(username):
+            print(f"⛔ Acceso denegado: {username} no está en la lista blanca")
+            return False
+        
         try:
             common_url = f'{self.url}/xmlrpc/2/common'
             common = xmlrpc.client.ServerProxy(common_url)
             user_uid = common.authenticate(self.db, username, password, {})
+            if user_uid:
+                print(f"✅ Acceso autorizado: {username}")
             return bool(user_uid)
-        except Exception:
+        except Exception as e:
+            print(f"Error en autenticación: {e}")
             return False
 
     def get_stock_inventory(self, search_term=None, product_id=None, grupo_id=None, linea_id=None, lugar_id=None):

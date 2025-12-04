@@ -1,0 +1,14 @@
+# Lista blanca de usuarios autorizados - EJEMPLO
+# Copia este archivo como 'whitelist.txt' y añade los emails autorizados
+# Un email por línea (comentarios permitidos con #)
+
+# Ejemplo:
+# usuario1@empresa.com
+# usuario2@empresa.com
+# usuario3@empresa.com
+
+# INSTRUCCIONES:
+# 1. Renombra este archivo a 'whitelist.txt'
+# 2. Añade los emails de usuarios autorizados (uno por línea)
+# 3. Los emails se comparan en minúsculas (case-insensitive)
+# 4. Líneas vacías y que empiezan con # son ignoradas
