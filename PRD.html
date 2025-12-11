@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD - Sistema de Gestión de Inventario y Stock</title>
+    <style>
+        :root {
+            --primary-color: #875A7B;
+            --secondary-color: #E53935;
+            --accent-color: #FFBF00;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --code-bg: #f4f4f4;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --success: #4caf50;
+            --warning: #ff9800;
+            --info: #2196f3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #a968a0);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .info-card p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, var(--primary-color), #9d6599);
+            color: white;
+            padding: 20px 25px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(90deg, #9d6599, var(--primary-color));
+        }
+
+        .section-content {
+            padding: 25px;
+            display: none;
+        }
+
+        .section.active .section-content {
+            display: block;
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+            font-size: 1.2em;
+        }
+
+        .section.active .chevron {
+            transform: rotate(180deg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table th,
+        table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-warning { background: #fff3e0; color: #f57c00; }
+        .badge-info { background: #e3f2fd; color: #1976d2; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+
+        .status-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .status-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .status-list li::before {
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        .status-list li.done::before {
+            content: "✅";
+        }
+
+        .status-list li.pending::before {
+            content: "⏳";
+        }
+
+        .status-list li.warning::before {
+            content: "⚠️";
+        }
+
+        .highlight-box {
+            background: linear-gradient(120deg, #fff9e6 0%, #fff3cc 100%);
+            border-left: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .metric-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .metric-card .label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .roadmap {
+            position: relative;
+            padding-left: 40px;
+            margin: 20px 0;
+        }
+
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--success), var(--info), var(--warning));
+        }
+
+        .roadmap-item {
+            position: relative;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .roadmap-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 20px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary-color);
+        }
+
+        .roadmap-item.completed::before {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section.active .section-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media print {
+            .section-header { cursor: default; }
+            .section-content { display: block !important; }
+            .chevron { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 PRD - Sistema de Inventario y Stock</h1>
+            <p>Product Requirements Document</p>
+            <div class="version-badge">Versión 1.0 - Diciembre 2025</div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🏢 Proyecto</h3>
+                <p><strong>Nombre:</strong> Sistema de Inventario - AgrovetMarket</p>
+                <p><strong>Owner:</strong> Jonathan Cerda</p>
+            </div>
+            <div class="info-card">
+                <h3>💻 Stack Tecnológico</h3>
+                <p>Python/Flask + Odoo ERP</p>
+                <p>Chart.js + ECharts</p>
+            </div>
+            <div class="info-card">
+                <h3>🚀 Deployment</h3>
+                <p><strong>Platform:</strong> Render</p>
+                <p><strong>Repo:</strong> github.com/jonathancerda-hub</p>
+            </div>
+        </div>
+
+        <div class="section active" id="vision">
+            <div class="section-header" onclick="toggleSection('vision')">
+                <span>🎯 Visión del Producto</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Problema que Resuelve</h3>
+                <div class="highlight-box">
+                    Los equipos comerciales y de gestión de AgrovetMarket necesitan acceso rápido y visual a información crítica del inventario, especialmente productos próximos a vencer, sin necesidad de navegar por la interfaz completa de Odoo ERP.
+                </div>
+
+                <h3>Solución Propuesta</h3>
+                <p>Una aplicación web ligera que se conecta directamente a Odoo mediante XML-RPC, proporcionando:</p>
+                <div class="feature-grid">
+                    <div class="feature-card">Dashboard interactivo con visualizaciones</div>
+                    <div class="feature-card">Filtros avanzados por línea y categoría</div>
+                    <div class="feature-card">Alertas visuales codificadas por color</div>
+                    <div class="feature-card">Exportación de datos a Excel</div>
+                    <div class="feature-card">Control de acceso con lista blanca</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="usuarios">
+            <div class="section-header" onclick="toggleSection('usuarios')">
+                <span>👥 Usuarios Objetivo</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Perfil Principal: Equipo Comercial de AgrovetMarket</h3>
+                <div class="metric-card">
+                    <div class="number">39</div>
+                    <div class="label">Usuarios Autorizados</div>
+                </div>
+
+                <h3 style="margin-top: 20px;">Roles y Necesidades</h3>
+                <ul>
+                    <li><strong>Vendedores:</strong> Consultar disponibilidad de productos rápidamente</li>
+                    <li><strong>Coordinadores:</strong> Identificar productos próximos a vencer</li>
+                    <li><strong>Gerentes de línea:</strong> Exportar reportes para análisis offline</li>
+                    <li><strong>Equipo comercial:</strong> Filtrar por línea comercial asignada</li>
+                </ul>
+
+                <h3>Requisitos de Acceso</h3>
+                <ul class="status-list">
+                    <li class="done">Lista blanca controlada (whitelist.txt)</li>
+                    <li class="done">Autenticación mediante credenciales de Odoo</li>
+                    <li class="done">Acceso solo a usuarios @agrovetmarket.com</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="autenticacion">
+            <div class="section-header" onclick="toggleSection('autenticacion')">
+                <span>🔒 Autenticación y Seguridad</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Sistema de Login</h3>
+                <table>
+                    <tr>
+                        <th>Input</th>
+                        <td>Email corporativo + contraseña Odoo</td>
+                    </tr>
+                    <tr>
+                        <th>Validación</th>
+                        <td>1. Verificación en lista blanca<br>2. Autenticación XML-RPC contra Odoo</td>
+                    </tr>
+                    <tr>
+                        <th>Output</th>
+                        <td>Sesión Flask con username almacenado</td>
+                    </tr>
+                </table>
+
+                <h3>Mensajes de Error Diferenciados</h3>
+                <ul>
+                    <li><span class="badge badge-danger">Usuario no autorizado</span> → Usuario no está en whitelist</li>
+                    <li><span class="badge badge-warning">Credenciales incorrectas</span> → Password inválido</li>
+                </ul>
+
+                <h3>Criterios de Aceptación</h3>
+                <ul class="status-list">
+                    <li class="done">Usuario en whitelist + credenciales válidas → acceso concedido</li>
+                    <li class="done">Usuario NO en whitelist → acceso denegado inmediato</li>
+                    <li class="done">Sesión persistente durante navegación</li>
+                    <li class="done">Logout limpia la sesión</li>
+                </ul>
+
+                <h3>Datos Sensibles Protegidos</h3>
+                <ul class="status-list">
+                    <li class="done">.env en .gitignore → credenciales NO en repo</li>
+                    <li class="done">whitelist.txt en .gitignore → emails NO públicos</li>
+                    <li class="done">SECRET_KEY rotable vía variable de entorno</li>
+                    <li class="warning">Debug mode debe estar deshabilitado en producción</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="dashboard">
+            <div class="section-header" onclick="toggleSection('dashboard')">
+                <span>📊 Dashboard Principal</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>KPIs en Tiempo Real</h3>
+                <div class="info-grid">
+                    <div class="metric-card">
+                        <div class="label">Total de Productos</div>
+                        <div class="number">📦</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Cantidad Total en Stock</div>
+                        <div class="number">📈</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Unidades por Vencer (0-3m)</div>
+                        <div class="number">🔴</div>
+                    </div>
+                </div>
+
+                <h3>Visualizaciones Interactivas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gráfico</th>
+                            <th>Tipo</th>
+                            <th>Librería</th>
+                            <th>Interacción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Top 5 Productos con Mayor Stock</td>
+                            <td>Barras horizontales</td>
+                            <td>Chart.js</td>
+                            <td>Click → filtrar por producto</td>
+                        </tr>
+                        <tr>
+                            <td>Stock por Rango de Vencimiento</td>
+                            <td>Dona</td>
+                            <td>Chart.js</td>
+                            <td>Click → filtrar por rango</td>
+                        </tr>
+                        <tr>
+                            <td>Unidades por Vencer por Línea</td>
+                            <td>Barras horizontales</td>
+                            <td>ECharts</td>
+                            <td>Click → filtrar línea + exp_status</td>
+                        </tr>
+                        <tr>
+                            <td>Top 5 Productos por Vencer</td>
+                            <td>Barras</td>
+                            <td>ECharts</td>
+                            <td>Click → filtrar por producto</td>
+                        </tr>
+                        <tr>
+                            <td>Stock por Categoría</td>
+                            <td>Barras</td>
+                            <td>ECharts</td>
+                            <td>Visual</td>
+                        </tr>
+                        <tr>
+                            <td>Stock por Línea Comercial</td>
+                            <td>Barras</td>
+                            <td>ECharts</td>
+                            <td>Visual</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Filtros del Dashboard</h3>
+                <ul>
+                    <li><strong>Línea Comercial:</strong> Dropdown con líneas disponibles</li>
+                    <li><strong>Categoría:</strong> Dropdown con categorías de productos</li>
+                    <li><strong>Lugar:</strong> Dropdown con ubicaciones de almacén</li>
+                    <li>Actualización dinámica vía AJAX sin recargar página</li>
+                </ul>
+
+                <h3>Criterios de Aceptación</h3>
+                <ul class="status-list">
+                    <li class="done">Dashboard carga en &lt;3 segundos</li>
+                    <li class="done">Gráficos responsivos (1920x1080+)</li>
+                    <li class="done">Clicks redirigen con filtros correctos</li>
+                    <li class="done">Filtros aplican sin recargar página</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="inventario">
+            <div class="section-header" onclick="toggleSection('inventario')">
+                <span>📦 Página de Inventario</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Columnas de la Tabla</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Columna</th>
+                            <th>Origen</th>
+                            <th>Formato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>Línea Comercial</td><td>commercial_line_national_id</td><td>String</td></tr>
+                        <tr><td>2</td><td>Grupo Artículo</td><td>product.categ_id</td><td>String</td></tr>
+                        <tr><td>3</td><td>Código Artículo</td><td>product.default_code</td><td>String (SKU)</td></tr>
+                        <tr><td>4</td><td>Producto</td><td>product.display_name</td><td>String</td></tr>
+                        <tr><td>5</td><td>Lugar</td><td>location_id (transformado)</td><td>Abreviatura</td></tr>
+                        <tr><td>6</td><td>Fecha Expira</td><td>lot.expiration_date</td><td>DD-MM-YYYY</td></tr>
+                        <tr><td>7</td><td>Cantidad</td><td>available_quantity</td><td>#,###</td></tr>
+                        <tr><td>8</td><td>Meses Expira</td><td>Calculado</td><td>Integer (color)</td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Codificación de Colores (Meses Expira)</h3>
+                <ul>
+                    <li><span class="badge badge-danger">🔴 Rojo</span> 0-3 meses</li>
+                    <li><span class="badge badge-warning">🟠 Ámbar</span> 3-6 meses</li>
+                    <li><span class="badge" style="background: #ffffe0; color: #8b8000;">🟡 Amarillo</span> 6-9 meses</li>
+                    <li><span class="badge" style="background: #f0f0f0; color: #888;">⚪ Gris</span> 9-12 meses</li>
+                    <li><span class="badge badge-success">🟢 Verde</span> &gt;12 meses</li>
+                </ul>
+
+                <h3>Filtros Avanzados</h3>
+                <ul>
+                    <li>Línea Comercial (select)</li>
+                    <li>Grupo Artículo (select)</li>
+                    <li>Lugar (select)</li>
+                    <li>Búsqueda libre (código/nombre/lote)</li>
+                    <li>Estado de vencimiento vía URL params</li>
+                </ul>
+
+                <h3>Criterios de Aceptación</h3>
+                <ul class="status-list">
+                    <li class="done">Muestra productos con cantidad &gt; 0</li>
+                    <li class="done">Búsqueda filtra correctamente</li>
+                    <li class="done">Colores consistentes</li>
+                    <li class="done">Filtros múltiples combinables</li>
+                    <li class="done">Ordenado por meses_expira ASC</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="exportacion">
+            <div class="section-header" onclick="toggleSection('exportacion')">
+                <span>📤 Exportación de Datos</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Exportación a Excel - Inventario Principal</h3>
+                <table>
+                    <tr><th>Endpoint</th><td>/export/excel</td></tr>
+                    <tr><th>Formato</th><td>.xlsx con timestamp</td></tr>
+                    <tr><th>Campos</th><td>Todos los visibles (IDs omitidos)</td></tr>
+                    <tr><th>Filtros</th><td>Respeta filtros activos</td></tr>
+                </table>
+
+                <h3>Formato de Columnas Excel</h3>
+                <ul>
+                    <li><strong>Cantidad:</strong> #,##0 (número con separador de miles)</li>
+                    <li><strong>Fecha:</strong> DD-MM-YYYY</li>
+                    <li><strong>Ancho:</strong> Auto-ajustado según contenido</li>
+                </ul>
+
+                <h3>Exportación de Inventario Internacional</h3>
+                <table>
+                    <tr><th>Endpoint</th><td>/export/excel/exportacion</td></tr>
+                    <tr><th>Ubicación</th><td>ALMC/Stock/PCP/Exportacion</td></tr>
+                    <tr><th>Campos adicionales</th><td>UM (unidad medida), Lote</td></tr>
+                    <tr><th>Línea</th><td>commercial_line_international_id</td></tr>
+                </table>
+
+                <h3>Criterios de Aceptación</h3>
+                <ul class="status-list">
+                    <li class="done">Excel descarga con nombre único</li>
+                    <li class="done">Datos coinciden con vista filtrada</li>
+                    <li class="done">Formato correcto (números y fechas)</li>
+                    <li class="done">Columnas legibles sin truncamiento</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="arquitectura">
+            <div class="section-header" onclick="toggleSection('arquitectura')">
+                <span>🏗️ Arquitectura Técnica</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Stack Backend</h3>
+                <table>
+                    <tr><th>Framework</th><td>Flask 2.3.3</td></tr>
+                    <tr><th>WSGI Server</th><td>Gunicorn 21.2.0</td></tr>
+                    <tr><th>Conexión Odoo</th><td>xmlrpc.client (Python stdlib)</td></tr>
+                    <tr><th>Sesiones</th><td>Flask sessions (server-side)</td></tr>
+                    <tr><th>Env Variables</th><td>python-dotenv 1.0.0</td></tr>
+                </table>
+
+                <h3>Stack Frontend</h3>
+                <table>
+                    <tr><th>Templates</th><td>Jinja2 3.1.2</td></tr>
+                    <tr><th>Gráficos</th><td>Chart.js 4.x + ECharts 5.x</td></tr>
+                    <tr><th>Excel Export</th><td>openpyxl + pandas</td></tr>
+                    <tr><th>Estilos</th><td>CSS custom con variables</td></tr>
+                </table>
+
+                <h3>Integración Odoo - Endpoints XML-RPC</h3>
+                <div class="code-block">
+/xmlrpc/2/common   → authenticate(db, user, password)
+/xmlrpc/2/object   → execute_kw(db, uid, password, model, method, args)</div>
+
+                <h3>Modelos de Odoo Consultados</h3>
+                <ul>
+                    <li><strong>stock.quant:</strong> Stock disponible por ubicación</li>
+                    <li><strong>product.product:</strong> Información de productos</li>
+                    <li><strong>stock.lot:</strong> Lotes y fechas de vencimiento</li>
+                    <li><strong>product.category:</strong> Categorías (filtros)</li>
+                    <li><strong>Campos custom:</strong> commercial_line_national_id, commercial_line_international_id</li>
+                </ul>
+
+                <h3>Context Importante</h3>
+                <div class="code-block">{'lang': 'es_PE'}  # Fuerza idioma español en respuestas</div>
+
+                <h3>Ubicaciones de Stock (Filtros Default)</h3>
+                <table>
+                    <tr><td>ALMC/Stock/Corto Vencimiento/VCTO1A3M</td><td>→ 0≥P≤3</td></tr>
+                    <tr><td>ALMC/Stock/Corto Vencimiento/VCTO3A6M</td><td>→ 3&gt;P&lt;6</td></tr>
+                    <tr><td>ALMC/Stock/Corto Vencimiento/VCTO6A9M</td><td>→ 6≥P&lt;9</td></tr>
+                    <tr><td>ALMC/Stock/Corto Vencimiento/VCTO9A12M</td><td>→ 9≥P≤12</td></tr>
+                    <tr><td>ALMC/Stock/Comercial</td><td>→ P≥12</td></tr>
+                </table>
+
+                <h3>Variables de Entorno Requeridas</h3>
+                <div class="code-block">ODOO_URL=https://amah.odoo.com
+ODOO_DB=amah-main-9110254
+ODOO_USER=&lt;usuario_sistema&gt;
+ODOO_PASSWORD=&lt;contraseña_segura&gt;
+SECRET_KEY=&lt;clave_flask_session&gt;</div>
+            </div>
+        </div>
+
+        <div class="section" id="metricas">
+            <div class="section-header" onclick="toggleSection('metricas')">
+                <span>📈 Métricas de Éxito</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>KPIs del Producto</h3>
+                <div class="info-grid">
+                    <div class="metric-card">
+                        <div class="label">Tiempo de Carga</div>
+                        <div class="number">&lt;3s</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Disponibilidad</div>
+                        <div class="number">&gt;99%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Usuarios Activos</div>
+                        <div class="number">39</div>
+                    </div>
+                </div>
+
+                <h3>Métricas de Rendimiento</h3>
+                <table>
+                    <tr>
+                        <th>Consultas Dashboard</th>
+                        <td>3-5 consultas (cacheadas)</td>
+                    </tr>
+                    <tr>
+                        <th>Consultas Inventario</th>
+                        <td>1-2 consultas por filtro</td>
+                    </tr>
+                    <tr>
+                        <th>Tamaño HTML Dashboard</th>
+                        <td>~150KB</td>
+                    </tr>
+                    <tr>
+                        <th>Tamaño JSON Inventario</th>
+                        <td>50-200KB (variable)</td>
+                    </tr>
+                    <tr>
+                        <th>Exportación Excel</th>
+                        <td>&lt;10s para 1000 productos</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section" id="roadmap">
+            <div class="section-header" onclick="toggleSection('roadmap')">
+                <span>🗓️ Roadmap</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <div class="roadmap">
+                    <div class="roadmap-item completed">
+                        <h3>Fase 1 - v1.0 (Actual) ✅</h3>
+                        <ul class="status-list">
+                            <li class="done">Autenticación y lista blanca</li>
+                            <li class="done">Dashboard con 6 gráficos interactivos</li>
+                            <li class="done">Inventario filtrable y exportable</li>
+                            <li class="done">Codificación por colores de vencimiento</li>
+                            <li class="done">Exportación a Excel</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <h3>Fase 2 - v1.1 (Planificada) ⏳</h3>
+                        <ul class="status-list">
+                            <li class="pending">Cache de consultas con Redis</li>
+                            <li class="pending">Paginación en tabla de inventario</li>
+                            <li class="pending">Filtros persistentes en sesión</li>
+                            <li class="pending">Histórico de exportaciones</li>
+                            <li class="pending">Notificaciones de productos críticos</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <h3>Fase 3 - v2.0 (Futuro) 🔮</h3>
+                        <ul class="status-list">
+                            <li class="pending">API REST para integraciones externas</li>
+                            <li class="pending">Dashboard personalizable por usuario</li>
+                            <li class="pending">Reportes programados (email)</li>
+                            <li class="pending">Multi-idioma (es/en)</li>
+                            <li class="pending">App móvil (PWA)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Mejoras Técnicas Sugeridas</h3>
+                <ul class="status-list">
+                    <li class="pending">Convertir cantidad_disponible a numérico en backend</li>
+                    <li class="pending">Agregar arrays de IDs en JSON embebidos</li>
+                    <li class="pending">Implementar logging estructurado (JSON logs)</li>
+                    <li class="pending">Tests unitarios para transformaciones</li>
+                    <li class="pending">CI/CD con tests automáticos pre-deploy</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="issues">
+            <div class="section-header" onclick="toggleSection('issues')">
+                <span>🐛 Issues Conocidos</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Limitaciones Actuales</h3>
+                <table>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Impacto</th>
+                        <th>Workaround</th>
+                    </tr>
+                    <tr>
+                        <td>cantidad_disponible es String</td>
+                        <td>⚠️ Medio</td>
+                        <td>Conversión con .replace(',', '')</td>
+                    </tr>
+                    <tr>
+                        <td>Sin paginación</td>
+                        <td>⚠️ Medio</td>
+                        <td>Tabla puede ser lenta con &gt;1000 productos</td>
+                    </tr>
+                    <tr>
+                        <td>Cache manual</td>
+                        <td>⚠️ Bajo</td>
+                        <td>Se limpia solo al reiniciar app</td>
+                    </tr>
+                    <tr>
+                        <td>Idioma hardcodeado</td>
+                        <td>⚠️ Bajo</td>
+                        <td>es_PE fijo en queries</td>
+                    </tr>
+                    <tr>
+                        <td>Matching por texto</td>
+                        <td>⚠️ Medio</td>
+                        <td>Links usan match de strings vs IDs</td>
+                    </tr>
+                </table>
+
+                <h3>Workarounds Aplicados</h3>
+                <ul>
+                    <li>✅ Altura dinámica en gráficos para evitar overflow</li>
+                    <li>✅ Transformación de nombres de ubicación para UI compacta</li>
+                    <li>✅ Helper _strip_html para descripciones con HTML</li>
+                    <li>✅ Validación de fecha con try/except para formatos inconsistentes</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="stakeholders">
+            <div class="section-header" onclick="toggleSection('stakeholders')">
+                <span>🤝 Stakeholders y Contactos</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rol</th>
+                            <th>Nombre/Email</th>
+                            <th>Responsabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Product Owner</td>
+                            <td>Jonathan Cerda<br>jonathan.cerda@agrovetmarket.com</td>
+                            <td>Dirección del producto</td>
+                        </tr>
+                        <tr>
+                            <td>Usuarios Finales</td>
+                            <td>39 usuarios comerciales<br>@agrovetmarket.com</td>
+                            <td>Validación de requerimientos</td>
+                        </tr>
+                        <tr>
+                            <td>Admin Odoo</td>
+                            <td>TBD</td>
+                            <td>Mantenimiento permisos y campos custom</td>
+                        </tr>
+                        <tr>
+                            <td>DevOps</td>
+                            <td>Render (auto-deploy)</td>
+                            <td>Deploy y uptime</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section" id="documentacion">
+            <div class="section-header" onclick="toggleSection('documentacion')">
+                <span>📚 Documentación Adicional</span>
+                <span class="chevron">▼</span>
+            </div>
+            <div class="section-content">
+                <h3>Archivos de Referencia</h3>
+                <ul>
+                    <li><strong>info_tecnica.html</strong> → Guía técnica interactiva con diagramas Mermaid</li>
+                    <li><strong>manual_usuario.html</strong> → Manual de usuario</li>
+                    <li><strong>SECURITY_REPORT.md</strong> → Análisis de vulnerabilidades y mitigaciones</li>
+                    <li><strong>docs/request_flow.json</strong> → Flujo detallado de requests</li>
+                    <li><strong>PRD.md</strong> → Versión Markdown de este documento</li>
+                </ul>
+
+                <h3>Estructura de Archivos del Proyecto</h3>
+                <div class="code-block">inventario-stock/
+├── app.py                    # Aplicación Flask principal
+├── odoo_manager.py          # Lógica de negocio y conexión Odoo
+├── conectar_odoo.py         # Script de prueba
+├── requirements.txt         # Dependencias
+├── .env                     # Variables de entorno (NO en repo)
+├── whitelist.txt           # Lista blanca (NO en repo)
+├── whitelist.txt.example   # Plantilla
+├── static/
+│   ├── css/style.css
+│   └── js/script.js
+├── templates/
+│   ├── base.html
+│   ├── login.html
+│   ├── dashboard.html
+│   ├── inventory.html
+│   └── export_inventory.html
+└── docs/
+    └── request_flow.json</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('active');
+        }
+
+        // Abrir primera sección por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📋 PRD cargado exitosamente');
+        });
+    </script>
+</body>
+</html>

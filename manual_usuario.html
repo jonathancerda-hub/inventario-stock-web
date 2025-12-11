@@ -3,7 +3,880 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual de Usuario - Inventario Odoo</title>
+    <title>Manual de Usuario - Inventario AgrovetMarket</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --odoo-primary-color: #875A7B;
+            --odoo-primary-color-dark: #6f4a64;
+            --odoo-light-gray: #f4f4f4;
+            --odoo-border-color: #dee2e6;
+            --odoo-text-color: #4c4c4c;
+            --odoo-header-color: #333;
+            --odoo-card-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+
+        body {
+            font-family: 'Roboto', 'Lato', sans-serif;
+            margin: 0;
+            background-color: var(--odoo-light-gray);
+            color: var(--odoo-text-color);
+            display: flex;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #ffffff;
+            border-right: 1px solid var(--odoo-border-color);
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            color: var(--odoo-primary-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar h2 .bi {
+            margin-right: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--odoo-text-color);
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: var(--odoo-primary-color);
+            color: #fff;
+        }
+
+        .main-content {
+            margin-left: 300px;
+            flex-grow: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            border-bottom: 2px solid var(--odoo-border-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: var(--odoo-header-color);
+            margin: 0;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .card {
+            background-color: #fff;
+            border: 1px solid var(--odoo-border-color);
+            border-radius: 8px;
+            box-shadow: var(--odoo-card-shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--odoo-border-color);
+        }
+
+        .card-header h3 {
+            font-size: 22px;
+            color: var(--odoo-primary-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-header h3 .bi {
+            font-size: 1.2em;
+            margin-right: 12px;
+        }
+
+        .card-body {
+            padding: 25px;
+            line-height: 1.7;
+        }
+        
+        .card-body p, .card-body li {
+            font-size: 16px;
+        }
+        
+        .card-body strong {
+            color: var(--odoo-header-color);
+            font-weight: 700;
+        }
+        
+        .card-body ul, .card-body ol {
+            padding-left: 20px;
+        }
+
+        .card-body h4 {
+            color: var(--odoo-primary-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .color-box {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+        
+        .status-red { background-color: #ffe5e5; border-color: #f8bcbc; }
+        .status-amber { background-color: #fff7e0; border-color: #ffe9a1; }
+        .status-yellow { background-color: #ffffe0; border-color: #fffcb3; }
+        .status-grey { background-color: #f0f0f0; border-color: #cccccc; }
+        .status-green { background-color: #e3f9ed; border-color: #b8f7d1; }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+            color: #0d47a1;
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            border-color: #4caf50;
+            color: #1b5e20;
+        }
+
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--odoo-primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        table th,
+        table td {
+            border: 1px solid var(--odoo-border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--odoo-header-color);
+        }
+
+        table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .tip-box {
+            background: linear-gradient(120deg, #fff9e6 0%, #fff3cc 100%);
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .tip-box strong {
+            color: #f57c00;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2><i class="bi bi-rocket-takeoff"></i>Manual de Usuario</h2>
+            <nav>
+                <ul>
+                    <li><a href="#introduccion" class="active">1. Introducción</a></li>
+                    <li><a href="#acceso">2. Acceso al Sistema</a></li>
+                    <li><a href="#dashboard">3. Dashboard Principal</a></li>
+                    <li><a href="#inventario">4. Inventario de Stock</a></li>
+                    <li><a href="#filtros">5. Filtros Avanzados</a></li>
+                    <li><a href="#exportacion">6. Exportar a Excel</a></li>
+                    <li><a href="#colores">7. Códigos de Color</a></li>
+                    <li><a href="#navegacion">8. Navegación</a></li>
+                    <li><a href="#faq">9. Preguntas Frecuentes</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1><i class="bi bi-rocket-takeoff"></i> Manual de Usuario</h1>
+                <p>Sistema de Gestión de Inventario y Stock - AgrovetMarket</p>
+            </header>
+
+            <section id="introduccion" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-info-circle"></i>1. Introducción</h3>
+                </div>
+                <div class="card-body">
+                    <p>Bienvenido al <strong>Sistema de Gestión de Inventario y Stock de AgrovetMarket</strong>. Esta aplicación web ha sido diseñada específicamente para el equipo comercial, permitiendo:</p>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">Consultar inventario en tiempo real</div>
+                        <div class="feature-item">Identificar productos por vencer</div>
+                        <div class="feature-item">Visualizar datos con gráficos interactivos</div>
+                        <div class="feature-item">Filtrar por línea comercial</div>
+                        <div class="feature-item">Exportar reportes a Excel</div>
+                        <div class="feature-item">Acceso seguro y controlado</div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong><i class="bi bi-shield-check"></i> Acceso Autorizado:</strong> Este sistema está disponible únicamente para usuarios autorizados del equipo comercial de AgrovetMarket. El acceso está controlado mediante una lista blanca de usuarios.
+                    </div>
+
+                    <h4>Características Principales</h4>
+                    <ul>
+                        <li><strong>Conexión directa con Odoo:</strong> Todos los datos provienen directamente del ERP en tiempo real</li>
+                        <li><strong>Dashboard interactivo:</strong> 6 gráficos que muestran el estado del inventario de un vistazo</li>
+                        <li><strong>Alertas visuales:</strong> Código de colores para identificar productos críticos rápidamente</li>
+                        <li><strong>Filtros potentes:</strong> Busca y filtra por línea comercial, categoría, ubicación y más</li>
+                        <li><strong>Exportación flexible:</strong> Descarga datos filtrados en formato Excel</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="acceso" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-box-arrow-in-right"></i>2. Acceso al Sistema</h3>
+                </div>
+                <div class="card-body">
+                    <h4>2.1. Requisitos de Acceso</h4>
+                    <p>Para acceder al sistema necesitas:</p>
+                    <ul>
+                        <li>Estar en la <strong>lista blanca de usuarios autorizados</strong></li>
+                        <li>Tener <strong>credenciales válidas de Odoo</strong></li>
+                        <li>Usar un email corporativo <strong>@agrovetmarket.com</strong></li>
+                    </ul>
+
+                    <h4>2.2. Proceso de Login</h4>
+                    <ol>
+                        <li><span class="step-number">1</span><strong>Acceder a la URL:</strong> Abre el navegador y accede a la dirección proporcionada por tu administrador</li>
+                        <li><span class="step-number">2</span><strong>Ingresar credenciales:</strong> 
+                            <ul>
+                                <li>Email: Tu correo corporativo completo (ejemplo: usuario@agrovetmarket.com)</li>
+                                <li>Contraseña: Tu contraseña de Odoo</li>
+                            </ul>
+                        </li>
+                        <li><span class="step-number">3</span><strong>Click en "Log in":</strong> El sistema validará tus credenciales en dos pasos:
+                            <ul>
+                                <li>Primero verifica si estás en la lista blanca</li>
+                                <li>Luego valida tu contraseña contra Odoo</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="alert alert-warning">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Mensajes de Error:</strong>
+                        <ul style="margin-bottom: 0; margin-top: 10px;">
+                            <li><strong>"Acceso denegado. Usuario no autorizado"</strong> → Tu email no está en la lista blanca. Contacta al administrador.</li>
+                            <li><strong>"Usuario o contraseña incorrectos"</strong> → Verifica tus credenciales de Odoo.</li>
+                        </ul>
+                    </div>
+
+                    <h4>2.3. Primera Vez en el Sistema</h4>
+                    <p>Al iniciar sesión exitosamente, serás redirigido automáticamente a la <strong>Página de Inventario</strong>. En la esquina superior derecha verás tu nombre de usuario.</p>
+                </div>
+            </section>
+
+            <section id="dashboard" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-bar-chart-line"></i>3. Dashboard Principal</h3>
+                </div>
+                <div class="card-body">
+                    <p>El Dashboard es tu centro de comando visual. Accede haciendo click en <strong>"Ver Dashboard"</strong> desde cualquier página.</p>
+
+                    <h4>3.1. KPIs (Indicadores Principales)</h4>
+                    <p>En la parte superior verás 3 métricas clave:</p>
+                    <table>
+                        <tr>
+                            <th>KPI</th>
+                            <th>Descripción</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Total de Productos</strong></td>
+                            <td>Número de productos únicos en inventario</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cantidad Total</strong></td>
+                            <td>Suma de unidades con fecha de vencimiento</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vence Pronto (0-3 meses)</strong></td>
+                            <td>Unidades críticas que requieren atención inmediata</td>
+                        </tr>
+                    </table>
+
+                    <h4>3.2. Gráficos Interactivos</h4>
+                    <p>El dashboard contiene <strong>6 gráficos interactivos</strong> que puedes hacer click para filtrar el inventario:</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Gráfico</th>
+                                <th>Función</th>
+                                <th>Interacción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Top 5 Productos</strong></td>
+                                <td>Productos con mayor stock</td>
+                                <td>Click → Ver inventario del producto</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Stock por Vencimiento</strong></td>
+                                <td>Distribución por rangos de meses (dona)</td>
+                                <td>Click → Filtrar por rango</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Por Vencer por Línea</strong></td>
+                                <td>Productos críticos (0-3m) por línea comercial</td>
+                                <td>Click → Filtrar línea + críticos</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Top 5 Por Vencer</strong></td>
+                                <td>Productos más urgentes en 0-3 meses</td>
+                                <td>Click → Ver inventario del producto</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Stock por Categoría</strong></td>
+                                <td>Total de stock por grupo de artículos</td>
+                                <td>Visual (sin filtro)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Stock por Línea</strong></td>
+                                <td>Total de stock por línea comercial</td>
+                                <td>Visual (sin filtro)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <strong><i class="bi bi-lightbulb"></i> Consejo:</strong> Haz click en cualquier barra o segmento de los gráficos 1, 2, 3 y 4 para ir directamente al inventario filtrado. ¡Muy útil para investigaciones rápidas!
+                    </div>
+
+                    <h4>3.3. Filtros del Dashboard</h4>
+                    <p>Puedes refinar todos los gráficos usando los filtros en la parte superior:</p>
+                    <ul>
+                        <li><strong>Línea Comercial:</strong> Muestra solo productos de una línea específica</li>
+                        <li><strong>Categoría:</strong> Filtra por grupo de artículos</li>
+                        <li><strong>Lugar:</strong> Filtra por ubicación de almacén</li>
+                    </ul>
+                    <p>Después de seleccionar, haz click en <strong>"Filtrar"</strong>. Los gráficos se actualizarán automáticamente sin recargar la página.</p>
+
+                    <h4>3.4. Actualización de Datos</h4>
+                    <p>En la parte superior verás:</p>
+                    <ul>
+                        <li><strong>Fecha y hora actual</strong></li>
+                        <li><strong>Última actualización:</strong> Cuándo se cargaron los datos por última vez</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="inventario" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-table"></i>4. Inventario de Stock</h3>
+                </div>
+                <div class="card-body">
+                    <p>La página de inventario muestra una <strong>tabla detallada</strong> de todos los productos en stock.</p>
+
+                    <h4>4.1. Columnas de la Tabla</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Columna</th>
+                                <th>Descripción</th>
+                                <th>Ejemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Línea Comercial</strong></td>
+                                <td>Línea a la que pertenece el producto</td>
+                                <td>Veterinaria, Nutrición Animal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Grupo Artículo</strong></td>
+                                <td>Categoría del producto</td>
+                                <td>Antibióticos, Vitaminas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Código Artículo</strong></td>
+                                <td>SKU o código interno</td>
+                                <td>VET-001, NUT-245</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Producto</strong></td>
+                                <td>Nombre completo del producto</td>
+                                <td>Amoxicilina 500mg</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lugar</strong></td>
+                                <td>Ubicación en almacén (abreviada)</td>
+                                <td>0≥P≤3, P≥12</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha Expira</strong></td>
+                                <td>Fecha de vencimiento</td>
+                                <td>15-03-2026</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cantidad</strong></td>
+                                <td>Unidades disponibles</td>
+                                <td>1,234</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Meses Expira</strong></td>
+                                <td>Meses restantes (con color)</td>
+                                <td>3 (con código de color)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>4.2. Abreviaturas de Ubicaciones</h4>
+                    <table>
+                        <tr>
+                            <th>Ubicación Completa</th>
+                            <th>Abreviatura</th>
+                            <th>Significado</th>
+                        </tr>
+                        <tr>
+                            <td>ALMC/Stock/Corto Vencimiento/VCTO1A3M</td>
+                            <td>0≥P≤3</td>
+                            <td>Productos que vencen en 0-3 meses</td>
+                        </tr>
+                        <tr>
+                            <td>ALMC/Stock/Corto Vencimiento/VCTO3A6M</td>
+                            <td>3>P<6</td>
+                            <td>Productos que vencen en 3-6 meses</td>
+                        </tr>
+                        <tr>
+                            <td>ALMC/Stock/Corto Vencimiento/VCTO6A9M</td>
+                            <td>6≥P<9</td>
+                            <td>Productos que vencen en 6-9 meses</td>
+                        </tr>
+                        <tr>
+                            <td>ALMC/Stock/Corto Vencimiento/VCTO9A12M</td>
+                            <td>9≥P≤12</td>
+                            <td>Productos que vencen en 9-12 meses</td>
+                        </tr>
+                        <tr>
+                            <td>ALMC/Stock/Comercial</td>
+                            <td>P≥12</td>
+                            <td>Productos con más de 12 meses</td>
+                        </tr>
+                    </table>
+
+                    <h4>4.3. Ordenamiento</h4>
+                    <p>La tabla está <strong>ordenada automáticamente</strong> por "Meses Expira" de menor a mayor. Esto significa que los productos más críticos aparecen primero.</p>
+                </div>
+            </section>
+
+            <section id="filtros" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-funnel"></i>5. Filtros Avanzados</h3>
+                </div>
+                <div class="card-body">
+                    <p>Utiliza los filtros en la parte superior de la página de inventario para encontrar exactamente lo que buscas.</p>
+
+                    <h4>5.1. Filtros Disponibles</h4>
+                    <ol>
+                        <li><strong>Línea Comercial</strong>
+                            <ul>
+                                <li>Selecciona una línea específica o deja "Todas" para ver todo</li>
+                                <li>Útil para vendedores asignados a líneas específicas</li>
+                            </ul>
+                        </li>
+                        <li><strong>Grupo Artículo</strong>
+                            <ul>
+                                <li>Filtra por categoría de productos</li>
+                                <li>Ejemplo: "Antibióticos", "Vitaminas", etc.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Lugar</strong>
+                            <ul>
+                                <li>Filtra por ubicación en almacén</li>
+                                <li>Por defecto muestra ubicaciones comerciales principales</li>
+                            </ul>
+                        </li>
+                        <li><strong>Búsqueda Libre</strong>
+                            <ul>
+                                <li>Escribe cualquier texto para buscar en:</li>
+                                <li>- Código de artículo (SKU)</li>
+                                <li>- Nombre de producto</li>
+                                <li>- Número de lote</li>
+                                <li>La búsqueda es flexible (no necesita coincidir exactamente)</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h4>5.2. Cómo Usar los Filtros</h4>
+                    <ol>
+                        <li><span class="step-number">1</span>Selecciona los filtros que necesites (puedes combinar varios)</li>
+                        <li><span class="step-number">2</span>Haz click en el botón <strong>"Buscar"</strong></li>
+                        <li><span class="step-number">3</span>La tabla se actualizará mostrando solo los resultados que coincidan</li>
+                        <li><span class="step-number">4</span>Para resetear, haz click en <strong>"Limpiar"</strong></li>
+                    </ol>
+
+                    <div class="tip-box">
+                        <strong><i class="bi bi-lightbulb"></i> Consejo Avanzado:</strong> Cuando haces click en un gráfico del dashboard, los filtros se aplican automáticamente en la URL. Puedes copiar esa URL y compartirla con un compañero para que vea exactamente los mismos datos filtrados.
+                    </div>
+
+                    <h4>5.3. Filtros Especiales vía URL</h4>
+                    <p>Algunos filtros avanzados se pueden aplicar mediante parámetros en la URL:</p>
+                    <ul>
+                        <li><code>exp_status=0,1,2,3</code> → Productos por vencer (todos los críticos)</li>
+                        <li><code>exp_status=vence_pronto</code> → Solo 0-3 meses</li>
+                        <li><code>exp_status=12+</code> → Más de 12 meses</li>
+                        <li><code>product_id=123</code> → Un producto específico</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="exportacion" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-file-earmark-spreadsheet"></i>6. Exportar a Excel</h3>
+                </div>
+                <div class="card-body">
+                    <h4>6.1. Exportar desde Inventario Principal</h4>
+                    <ol>
+                        <li><span class="step-number">1</span><strong>Aplica los filtros</strong> que necesites (línea, categoría, búsqueda, etc.)</li>
+                        <li><span class="step-number">2</span>Haz click en el botón <strong>"Exportar a Excel"</strong></li>
+                        <li><span class="step-number">3</span>Se descargará un archivo .xlsx con nombre único que incluye la fecha y hora</li>
+                    </ol>
+
+                    <div class="alert alert-success">
+                        <strong><i class="bi bi-check-circle"></i> El archivo Excel incluye:</strong>
+                        <ul style="margin-bottom: 0; margin-top: 10px;">
+                            <li>✅ Todas las columnas visibles en la tabla</li>
+                            <li>✅ Solo los datos filtrados actualmente</li>
+                            <li>✅ Formato de números con separador de miles</li>
+                            <li>✅ Fechas en formato DD-MM-YYYY</li>
+                            <li>✅ Ancho de columnas auto-ajustado</li>
+                        </ul>
+                    </div>
+
+                    <h4>6.2. Página de Exportación (Inventario Internacional)</h4>
+                    <p>Existe una página dedicada para exportaciones de inventario internacional:</p>
+                    <ul>
+                        <li><strong>Ubicación:</strong> ALMC/Stock/PCP/Exportacion</li>
+                        <li><strong>Línea Comercial:</strong> Internacional (no nacional)</li>
+                        <li><strong>Campos adicionales:</strong> Unidad de Medida (UM) y Lote</li>
+                    </ul>
+
+                    <h4>6.3. Nombre del Archivo</h4>
+                    <p>Los archivos exportados tienen el formato:</p>
+                    <code>inventario_[tipo]_DD-MM-YYYY_HH-MM.xlsx</code>
+                    <p>Ejemplo: <code>inventario_exportacion_04-12-2025_15-30.xlsx</code></p>
+
+                    <div class="tip-box">
+                        <strong><i class="bi bi-lightbulb"></i> Consejo:</strong> Si necesitas exportar regularmente los mismos datos, guarda la URL con filtros aplicados como marcador en tu navegador. Luego solo necesitas abrir el marcador y hacer click en "Exportar".
+                    </div>
+                </div>
+            </section>
+
+            <section id="colores" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-palette"></i>7. Códigos de Color</h3>
+                </div>
+                <div class="card-body">
+                    <p>El sistema usa un código de colores intuitivo para identificar rápidamente el estado de los productos según sus meses de vencimiento.</p>
+
+                    <h4>7.1. Código de Colores de Vencimiento</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">Color</th>
+                                <th>Rango</th>
+                                <th>Estado</th>
+                                <th>Acción Recomendada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="color-box status-red"></span></td>
+                                <td><strong>0-3 meses</strong></td>
+                                <td>🔴 CRÍTICO</td>
+                                <td>Prioridad máxima - Promocionar/Liquidar urgentemente</td>
+                            </tr>
+                            <tr>
+                                <td><span class="color-box status-amber"></span></td>
+                                <td><strong>3-6 meses</strong></td>
+                                <td>🟠 ADVERTENCIA</td>
+                                <td>Prioridad alta - Planificar estrategia de venta</td>
+                            </tr>
+                            <tr>
+                                <td><span class="color-box status-yellow"></span></td>
+                                <td><strong>6-9 meses</strong></td>
+                                <td>🟡 PRECAUCIÓN</td>
+                                <td>Monitorear - Incluir en rotación normal</td>
+                            </tr>
+                            <tr>
+                                <td><span class="color-box status-grey"></span></td>
+                                <td><strong>9-12 meses</strong></td>
+                                <td>⚪ ESTABLE</td>
+                                <td>Normal - Venta regular</td>
+                            </tr>
+                            <tr>
+                                <td><span class="color-box status-green"></span></td>
+                                <td><strong>&gt;12 meses</strong></td>
+                                <td>🟢 ÓPTIMO</td>
+                                <td>Excelente - Stock con buena vida útil</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert alert-warning">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Importante:</strong> Los productos marcados en ROJO (0-3 meses) requieren atención inmediata del equipo comercial para evitar pérdidas por vencimiento.
+                    </div>
+
+                    <h4>7.2. Dónde Aparecen los Colores</h4>
+                    <ul>
+                        <li><strong>Tabla de Inventario:</strong> La columna "Meses Expira" muestra el color de fondo</li>
+                        <li><strong>Dashboard:</strong> El gráfico de dona usa los mismos colores para los segmentos</li>
+                        <li><strong>Gráfico "Por Vencer por Línea":</strong> Las barras tienen intensidad según urgencia</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="navegacion" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-signpost-2"></i>8. Navegación</h3>
+                </div>
+                <div class="card-body">
+                    <h4>8.1. Menú Principal</h4>
+                    <p>En la parte superior de cada página encontrarás:</p>
+                    <ul>
+                        <li><strong>"Ver Dashboard"</strong> o <strong>"Volver al Inventario"</strong> → Cambia entre vistas</li>
+                        <li><strong>"Cerrar Sesión"</strong> → Sale del sistema de forma segura</li>
+                        <li><strong>Saludo con tu nombre</strong> → "Hola, [tu email]"</li>
+                    </ul>
+
+                    <h4>8.2. Flujo de Trabajo Típico</h4>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0;"><strong>Escenario 1: Revisión rápida del estado general</strong></p>
+                        <ol style="margin-top: 10px;">
+                            <li>Login → Ir al Dashboard</li>
+                            <li>Revisar KPIs y gráficos</li>
+                            <li>Identificar áreas críticas</li>
+                            <li>Click en gráfico para profundizar</li>
+                        </ol>
+                    </div>
+
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0;"><strong>Escenario 2: Buscar un producto específico</strong></p>
+                        <ol style="margin-top: 10px;">
+                            <li>Login → Página de Inventario</li>
+                            <li>Usar búsqueda libre (código o nombre)</li>
+                            <li>Revisar detalles y fecha de vencimiento</li>
+                            <li>Exportar a Excel si necesitas compartir</li>
+                        </ol>
+                    </div>
+
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                        <p style="margin: 0;"><strong>Escenario 3: Reporte para mi línea comercial</strong></p>
+                        <ol style="margin-top: 10px;">
+                            <li>Login → Dashboard</li>
+                            <li>Filtrar por mi línea comercial</li>
+                            <li>Ir a Inventario (mantiene el filtro)</li>
+                            <li>Exportar a Excel → Listo para reportar</li>
+                        </ol>
+                    </div>
+
+                    <h4>8.3. Cerrar Sesión</h4>
+                    <p>Siempre cierra sesión cuando termines, especialmente en equipos compartidos:</p>
+                    <ol>
+                        <li>Haz click en el botón <strong>"Cerrar Sesión"</strong> (esquina superior derecha)</li>
+                        <li>Serás redirigido a la pantalla de login</li>
+                        <li>Tu sesión queda cerrada de forma segura</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="faq" class="card">
+                <div class="card-header">
+                    <h3><i class="bi bi-question-circle"></i>9. Preguntas Frecuentes</h3>
+                </div>
+                <div class="card-body">
+                    <h4>¿Por qué no puedo iniciar sesión?</h4>
+                    <p><strong>Respuesta:</strong> Puede haber dos razones:</p>
+                    <ul>
+                        <li>Tu usuario no está en la lista blanca → Contacta al administrador (jonathan.cerda@agrovetmarket.com)</li>
+                        <li>Contraseña incorrecta → Verifica tus credenciales de Odoo o restablece tu contraseña</li>
+                    </ul>
+
+                    <h4>¿Los datos son en tiempo real?</h4>
+                    <p><strong>Respuesta:</strong> Sí, cada vez que cargas una página o aplicas filtros, el sistema consulta directamente a Odoo. Los datos que ves son los mismos que están en el ERP en ese momento.</p>
+
+                    <h4>¿Puedo ver inventario de otras líneas comerciales?</h4>
+                    <p><strong>Respuesta:</strong> Sí, todos los usuarios autorizados pueden ver todas las líneas. Los filtros te permiten enfocarte en tu línea, pero no hay restricción de acceso por línea.</p>
+
+                    <h4>¿Qué significa "N/A" en Meses Expira?</h4>
+                    <p><strong>Respuesta:</strong> Significa que ese producto no tiene fecha de vencimiento registrada en el sistema. Puede ser un producto sin lote o sin información de expiración.</p>
+
+                    <h4>¿El Excel exportado incluye los filtros?</h4>
+                    <p><strong>Respuesta:</strong> Sí, el archivo Excel contiene exactamente los datos que estás viendo en pantalla después de aplicar filtros. Si no aplicas filtros, exporta todo el inventario.</p>
+
+                    <h4>¿Puedo usar el sistema en el celular?</h4>
+                    <p><strong>Respuesta:</strong> El sistema es responsive y funciona en móviles, pero la experiencia óptima es en pantallas de escritorio/laptop (especialmente para el dashboard con gráficos).</p>
+
+                    <h4>¿Cómo reporto un error o sugiero una mejora?</h4>
+                    <p><strong>Respuesta:</strong> Contacta al Product Owner: <strong>jonathan.cerda@agrovetmarket.com</strong></p>
+
+                    <h4>¿Con qué frecuencia debo revisar los productos en rojo?</h4>
+                    <p><strong>Respuesta:</strong> Se recomienda revisar los productos críticos (0-3 meses) <strong>semanalmente</strong> para planificar estrategias de venta o promociones.</p>
+
+                    <h4>¿Puedo guardar mis filtros favoritos?</h4>
+                    <p><strong>Respuesta:</strong> Actualmente no hay función de guardado de filtros, pero puedes <strong>guardar la URL completa</strong> (con filtros aplicados) como marcador en tu navegador.</p>
+
+                    <div class="alert alert-info" style="margin-top: 30px;">
+                        <strong><i class="bi bi-info-circle"></i> ¿Necesitas Ayuda Adicional?</strong><br>
+                        Contacta al equipo de soporte o al administrador del sistema para asistencia personalizada.
+                    </div>
+                </div>
+            </section>
+
+            <footer style="text-align: center; padding: 30px 0; color: #999; border-top: 1px solid var(--odoo-border-color); margin-top: 40px;">
+                <p><strong>Sistema de Gestión de Inventario y Stock</strong></p>
+                <p>AgrovetMarket © 2025 | Versión 1.0</p>
+                <p style="font-size: 0.9em;">Para soporte: jonathan.cerda@agrovetmarket.com</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.sidebar nav a');
+            const sections = document.querySelectorAll('.main-content section');
+
+            function changeLinkState() {
+                let index = sections.length;
+
+                while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
+                
+                links.forEach((link) => link.classList.remove('active'));
+                if (links[index]) links[index].classList.add('active');
+            }
+
+            changeLinkState();
+            window.addEventListener('scroll', changeLinkState);
+
+            // Smooth scroll
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -165,127 +1038,3 @@
 
     </style>
 </head>
-<body>
-    <div class="container">
-        <aside class="sidebar">
-            <h2><i class="bi bi-book"></i>Manual</h2>
-            <nav>
-                <ul>
-                    <li><a href="#introduccion" class="active">1. Introducción</a></li>
-                    <li><a href="#acceso">2. Acceso e Inicio de Sesión</a></li>
-                    <li><a href="#inventario">3. Página de Inventario</a></li>
-                    <li><a href="#exportacion">4. Página de Exportación</a></li>
-                    <li><a href="#dashboard">5. Dashboard</a></li>
-                    <li><a href="#logout">6. Cerrar Sesión</a></li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <header class="header">
-                <h1>Manual de Usuario</h1>
-                <p>Aplicación de Visualización de Inventario Odoo</p>
-            </header>
-
-            <section id="introduccion" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-rocket-takeoff"></i>1. Introducción</h3>
-                </div>
-                <div class="card-body">
-                    <p>Bienvenido a la guía de la aplicación de visualización de inventario. Esta herramienta está diseñada para ofrecerte una vista clara, interactiva y en tiempo real del stock de productos registrado en Odoo, permitiéndote tomar decisiones informadas de manera rápida y sencilla.</p>
-                </div>
-            </section>
-
-            <section id="acceso" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-box-arrow-in-right"></i>2. Acceso e Inicio de Sesión</h3>
-                </div>
-                <div class="card-body">
-                    <p>Para comenzar a usar la aplicación, sigue estos pasos:</p>
-                    <ol>
-                        <li><strong>Abrir la Aplicación:</strong> Accede a la aplicación a través de la URL proporcionada por tu administrador.</li>
-                        <li><strong>Iniciar Sesión:</strong> Serás recibido por una pantalla de inicio de sesión. Ingresa tu <strong>nombre de usuario</strong> y <strong>contraseña</strong> de Odoo en los campos correspondientes y haz clic en el botón "Log in".</li>
-                    </ol>
-                    <p>Si las credenciales son correctas, serás redirigido a la página principal de "Inventario de Stock".</p>
-                </div>
-            </section>
-
-            <section id="inventario" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-table"></i>3. Página de Inventario de Stock</h3>
-                </div>
-                <div class="card-body">
-                    <h4>3.1. Filtrar y Buscar el Inventario</h4>
-                    <p>En la parte superior, encontrarás una barra de filtros para refinar tu búsqueda:</p>
-                    <ul>
-                        <li><strong>Grupo Artículo:</strong> Despliega la lista para seleccionar una categoría específica de productos.</li>
-                        <li><strong>Línea Comercial:</strong> Filtra los productos que pertenecen a una línea comercial determinada.</li>
-                        <li><strong>Lugar:</strong> Muestra el stock de una ubicación o almacén específico.</li>
-                        <li><strong>Búsqueda:</strong> Escribe un nombre, código o lote de producto para encontrarlo rápidamente.</li>
-                    </ul>
-                    <p>Después de seleccionar tus filtros, haz clic en el botón <strong>"Buscar"</strong>. Para eliminar todos los filtros y ver el inventario completo, haz clic en <strong>"Limpiar"</strong>.</p>
-                    
-                    <h4>3.2. Exportar a Excel</h4>
-                    <p>Puedes exportar la vista actual de la tabla de inventario a un archivo de Excel. Simplemente haz clic en el botón <strong>"Exportar a Excel"</strong> y se descargará un archivo con los datos que estás visualizando.</p>
-                </div>
-            </section>
-
-            <section id="exportacion" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-file-earmark-spreadsheet"></i>4. Página de Exportación</h3>
-                </div>
-                <div class="card-body">
-                    <p>Esta página está diseñada para exportaciones de inventario más específicas. Puedes acceder a ella desde el menú de navegación.</p>
-                    <h4>4.1. Filtrar y Exportar</h4>
-                    <p>Utiliza los filtros disponibles (Término de búsqueda, Grupo de Artículo, Línea Comercial) para acotar los datos que deseas exportar. Luego, haz clic en el botón <strong>"Exportar a Excel"</strong> para generar y descargar el archivo.</p>
-                </div>
-            </section>
-
-            <section id="dashboard" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-bar-chart-line"></i>5. Dashboard de Inventario</h3>
-                </div>
-                <div class="card-body">
-                    <p>Para acceder a una vista gráfica y resumida del inventario, haz clic en el enlace <strong>"Dashboard"</strong> en el menú de navegación.</p>
-                    <p>El dashboard contiene varios gráficos interactivos que te permiten entender el estado de tu inventario de un solo vistazo. Puedes filtrar los datos del dashboard por:</p>
-                    <ul>
-                        <li><strong>Categoría</strong></li>
-                        <li><strong>Línea Comercial</strong></li>
-                        <li><strong>Lugar</strong></li>
-                    </ul>
-                    <p>Haz clic en el botón <strong>"Filtrar"</strong> para aplicar los filtros seleccionados. Para volver a la vista de tabla, utiliza el enlace <strong>"Inventario"</strong> del menú.</p>
-                </div>
-            </section>
-
-            <section id="logout" class="card">
-                <div class="card-header">
-                    <h3><i class="bi bi-box-arrow-left"></i>6. Cerrar Sesión</h3>
-                </div>
-                <div class="card-body">
-                    <p>Para salir de la aplicación de forma segura, haz clic en el botón <strong>"Cerrar Sesión"</strong> ubicado en la esquina superior derecha. Serás redirigido a la pantalla de inicio de sesión.</p>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('.sidebar nav a');
-            const sections = document.querySelectorAll('.main-content section');
-
-            function changeLinkState() {
-                let index = sections.length;
-
-                while(--index && window.scrollY + 50 < sections[index].offsetTop) {}
-                
-                links.forEach((link) => link.classList.remove('active'));
-                links[index].classList.add('active');
-            }
-
-            changeLinkState();
-            window.addEventListener('scroll', changeLinkState);
-        });
-    </script>
-</body>
-</html>
