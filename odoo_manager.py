@@ -183,9 +183,24 @@ class OdooManager:
             print(f"Error en la conexión principal a Odoo: {e}")
 
     def _load_whitelist(self):
-        """Carga la lista blanca de usuarios autorizados desde whitelist.txt"""
-        whitelist_path = os.path.join(os.path.dirname(__file__), 'whitelist.txt')
+        """Carga la lista blanca de usuarios autorizados desde variable de entorno o whitelist.txt"""
         whitelist = set()
+        
+        # Prioridad 1: Variable de entorno WHITELIST_EMAILS (para Render y producción)
+        env_whitelist = os.getenv('WHITELIST_EMAILS')
+        if env_whitelist:
+            try:
+                for email in env_whitelist.split(','):
+                    email = email.strip()
+                    if email and not email.startswith('#'):
+                        whitelist.add(email.lower())
+                print(f"✅ Lista blanca cargada desde variable de entorno: {len(whitelist)} usuarios autorizados")
+                return whitelist
+            except Exception as e:
+                print(f"⚠️ Error procesando WHITELIST_EMAILS: {e}")
+        
+        # Prioridad 2: Archivo whitelist.txt (para desarrollo local)
+        whitelist_path = os.path.join(os.path.dirname(__file__), 'whitelist.txt')
         try:
             if os.path.exists(whitelist_path):
                 with open(whitelist_path, 'r', encoding='utf-8') as f:
@@ -194,11 +209,12 @@ class OdooManager:
                         # Ignorar líneas vacías y comentarios
                         if line and not line.startswith('#'):
                             whitelist.add(line.lower())
-                print(f"Lista blanca cargada: {len(whitelist)} usuarios autorizados")
+                print(f"✅ Lista blanca cargada desde archivo: {len(whitelist)} usuarios autorizados")
             else:
-                print("⚠️ Advertencia: archivo whitelist.txt no encontrado. Todos los usuarios con credenciales válidas tendrán acceso.")
+                print("⚠️ Advertencia: No se encontró whitelist.txt ni WHITELIST_EMAILS. Todos los usuarios con credenciales válidas tendrán acceso.")
         except Exception as e:
-            print(f"Error cargando whitelist: {e}")
+            print(f"⚠️ Error cargando whitelist desde archivo: {e}")
+        
         return whitelist
 
     def is_user_authorized(self, username):
