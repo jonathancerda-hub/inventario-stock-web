@@ -232,6 +232,10 @@ def inventory():
     if 'username' not in session:
         return redirect(url_for('login'))
     
+    # Verificar si el usuario tiene permiso de descarga
+    download_whitelist = os.getenv('DOWNLOAD_WHITELIST', '').split(',') if os.getenv('DOWNLOAD_WHITELIST') else []
+    can_download = session.get('username', '').lower() in [email.strip().lower() for email in download_whitelist]
+    
     filter_options = data_manager.get_filter_options()
     
     if request.method == 'POST':
@@ -272,7 +276,8 @@ def inventory():
         'inventory.html', 
         inventory=stock_data, 
         filter_options=filter_options,
-        selected_filters=selected_filters
+        selected_filters=selected_filters,
+        can_download=can_download
     )
 
 if __name__ == '__main__':

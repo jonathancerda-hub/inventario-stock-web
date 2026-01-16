@@ -6,6 +6,11 @@
     <h3 class="page-greeting" style="font-size:0.95em; color:#444; margin-top:6px;">Hola, {{ session.get('username') }}</h3>
     <div style="display: flex; gap: var(--space-2);">
         <a href="{{ url_for('dashboard') }}" class="btn">Ver Dashboard</a>
+        {% if can_download %}
+        <a href="{{ url_for('export_excel', **selected_filters) }}" class="btn btn--excel">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Descargar Excel
+        </a>
+        {% endif %}
         <a href="{{ url_for('logout') }}" class="btn btn--primary">Cerrar Sesión</a>
     </div>
 </header>
@@ -55,7 +60,6 @@
                 <input type="text" name="search_term" placeholder="..." value="{{ selected_filters.search_term or '' }}" class="form-control">
             </div>
             
-            <button type="submit" class="btn btn--secondary">Buscar</button>
             <a href="{{ url_for('inventory') }}" class="btn btn--secondary">Limpiar</a>
         </div>
     </form>
@@ -79,7 +83,7 @@
         <tbody>
             {% for item in inventory %}
             <tr>
-                <td>{{ item.linea_comercial }}</td>
+                <td class="col-no-wrap">{{ item.linea_comercial }}</td>
                 <td>{{ item.grupo_articulo }}</td>
                 <td>{{ item.cod_articulo }}</td>
                 <td>{{ item.producto }}</td>
@@ -110,4 +114,31 @@
 .status-grey { background-color: #f0f0f0; color: #888; border-left: 4px solid #cccccc; }
 .status-green { background-color: #e3f9ed; color: #3a7d5d; border-left: 4px solid #b8f7d1; }
 </style>
+
+<script>
+// Auto-submit del formulario cuando cambian los filtros
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.filter-bar form');
+    const selects = form.querySelectorAll('select');
+    const searchInput = form.querySelector('input[name="search_term"]');
+    let searchTimeout;
+    
+    // Auto-submit cuando cambian los selects
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            form.submit();
+        });
+    });
+    
+    // Auto-submit con delay para el campo de búsqueda
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                form.submit();
+            }, 800); // Espera 800ms después de que el usuario deje de escribir
+        });
+    }
+});
+</script>
 {% endblock %}
