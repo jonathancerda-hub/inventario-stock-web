@@ -12,6 +12,7 @@ class AnalyticsDB:
         """Inicializa la conexión a la base de datos de analytics"""
         self.db_type = 'sqlite'  # Por defecto SQLite para desarrollo
         self.db_path = 'analytics.db'
+        self.table_prefix = 'inv_'  # Prefijo para tablas (evita conflictos en BD compartida)
         # Usar zona horaria local del sistema
         try:
             self.local_tz = tzlocal.get_localzone()
@@ -49,8 +50,8 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
-                        CREATE TABLE IF NOT EXISTS page_visits (
+                    cursor.execute(f"""
+                        CREATE TABLE IF NOT EXISTS {self.table_prefix}page_visits (
                             id SERIAL PRIMARY KEY,
                             user_email VARCHAR(255) NOT NULL,
                             user_name VARCHAR(255),
@@ -65,12 +66,12 @@ class AnalyticsDB:
                         )
                     """)
                     # Crear índices
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_user ON page_visits(user_email)")
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON page_visits(visit_timestamp DESC)")
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_page ON page_visits(page_url)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_user ON {self.table_prefix}page_visits(user_email)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_timestamp ON {self.table_prefix}page_visits(visit_timestamp DESC)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_page ON {self.table_prefix}page_visits(page_url)")
                 else:
-                    cursor.execute("""
-                        CREATE TABLE IF NOT EXISTS page_visits (
+                    cursor.execute(f"""
+                        CREATE TABLE IF NOT EXISTS {self.table_prefix}page_visits (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                             user_email TEXT NOT NULL,
                             user_name TEXT,
@@ -84,9 +85,9 @@ class AnalyticsDB:
                             method TEXT
                         )
                     """)
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_user ON page_visits(user_email)")
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_timestamp ON page_visits(visit_timestamp)")
-                    cursor.execute("CREATE INDEX IF NOT EXISTS idx_visits_page ON page_visits(page_url)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_user ON {self.table_prefix}page_visits(user_email)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_timestamp ON {self.table_prefix}page_visits(visit_timestamp)")
+                    cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_prefix}visits_page ON {self.table_prefix}page_visits(page_url)")
                 conn.commit()
                 print("📊 Tablas de analytics creadas correctamente")
         except Exception as e:
@@ -102,16 +103,16 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
-                        INSERT INTO page_visits 
+                    cursor.execute(f"""
+                        INSERT INTO {self.table_prefix}page_visits 
                         (user_email, user_name, page_url, page_title, visit_timestamp, 
                          ip_address, user_agent, referrer, method)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """, (user_email, user_name, page_url, page_title, now_peru, 
                           ip_address, user_agent, referrer, method))
                 else:
-                    cursor.execute("""
-                        INSERT INTO page_visits 
+                    cursor.execute(f"""
+                        INSERT INTO {self.table_prefix}page_visits 
                         (user_email, user_name, page_url, page_title, visit_timestamp, 
                          ip_address, user_agent, referrer, method)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -128,13 +129,13 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
-                        SELECT COUNT(*) FROM page_visits 
+                    cursor.execute(f"""
+                        SELECT COUNT(*) FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                     """, (cutoff_date,))
                 else:
-                    cursor.execute("""
-                        SELECT COUNT(*) FROM page_visits 
+                    cursor.execute(f"""
+                        SELECT COUNT(*) FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                     """, (cutoff_date,))
                 return cursor.fetchone()[0]
@@ -149,13 +150,13 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
-                        SELECT COUNT(DISTINCT user_email) FROM page_visits 
+                    cursor.execute(f"""
+                        SELECT COUNT(DISTINCT user_email) FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                     """, (cutoff_date,))
                 else:
-                    cursor.execute("""
-                        SELECT COUNT(DISTINCT user_email) FROM page_visits 
+                    cursor.execute(f"""
+                        SELECT COUNT(DISTINCT user_email) FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                     """, (cutoff_date,))
                 return cursor.fetchone()[0]
@@ -170,20 +171,20 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT user_email, user_name, COUNT(*) as visit_count, 
                                MAX(visit_timestamp) as last_visit
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                         GROUP BY user_email, user_name
                         ORDER BY visit_count DESC
                         LIMIT %s
                     """, (cutoff_date, limit))
                 else:
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT user_email, user_name, COUNT(*) as visit_count, 
                                MAX(visit_timestamp) as last_visit
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                         GROUP BY user_email, user_name
                         ORDER BY visit_count DESC
@@ -213,17 +214,17 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT page_url, page_title, COUNT(*) as visit_count
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                         GROUP BY page_url, page_title
                         ORDER BY visit_count DESC
                     """, (cutoff_date,))
                 else:
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT page_url, page_title, COUNT(*) as visit_count
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                         GROUP BY page_url, page_title
                         ORDER BY visit_count DESC
@@ -242,21 +243,21 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT DATE(visit_timestamp) as visit_date, 
                                COUNT(*) as visit_count,
                                COUNT(DISTINCT user_email) as unique_users
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                         GROUP BY DATE(visit_timestamp)
                         ORDER BY visit_date ASC
                     """, (cutoff_date,))
                 else:
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT DATE(visit_timestamp) as visit_date, 
                                COUNT(*) as visit_count,
                                COUNT(DISTINCT user_email) as unique_users
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                         GROUP BY DATE(visit_timestamp)
                         ORDER BY visit_date ASC
@@ -275,19 +276,19 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT EXTRACT(HOUR FROM visit_timestamp) as hour, 
                                COUNT(*) as visit_count
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
                         GROUP BY EXTRACT(HOUR FROM visit_timestamp)
                         ORDER BY hour ASC
                     """, (cutoff_date,))
                 else:
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT CAST(strftime('%H', visit_timestamp) AS INTEGER) as hour, 
                                COUNT(*) as visit_count
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > ?
                         GROUP BY CAST(strftime('%H', visit_timestamp) AS INTEGER)
                         ORDER BY hour ASC
@@ -305,18 +306,18 @@ class AnalyticsDB:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT user_email, user_name, page_url, page_title, 
                                visit_timestamp, ip_address
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         ORDER BY visit_timestamp DESC
                         LIMIT %s
                     """, (limit,))
                 else:
-                    cursor.execute("""
+                    cursor.execute(f"""
                         SELECT user_email, user_name, page_url, page_title, 
                                visit_timestamp, ip_address
-                        FROM page_visits 
+                        FROM {self.table_prefix}page_visits 
                         ORDER BY visit_timestamp DESC
                         LIMIT ?
                     """, (limit,))
