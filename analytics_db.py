@@ -4,6 +4,7 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 import pytz
+import tzlocal
 from dateutil import parser
 
 class AnalyticsDB:
@@ -11,7 +12,13 @@ class AnalyticsDB:
         """Inicializa la conexión a la base de datos de analytics"""
         self.db_type = 'sqlite'  # Por defecto SQLite para desarrollo
         self.db_path = 'analytics.db'
-        self.peru_tz = pytz.timezone('America/Lima')
+        # Usar zona horaria local del sistema
+        try:
+            self.local_tz = tzlocal.get_localzone()
+        except:
+            # Fallback a America/Lima si no se puede detectar
+            self.local_tz = pytz.timezone('America/Lima')
+        self.peru_tz = self.local_tz  # Mantener peru_tz para compatibilidad
         
         # Intentar con PostgreSQL si está disponible
         database_url = os.getenv('DATABASE_URL')
@@ -20,11 +27,11 @@ class AnalyticsDB:
                 import psycopg2
                 self.db_type = 'postgresql'
                 self.database_url = database_url
-                print("✅ Analytics conectado a PostgreSQL (producción)")
+                print(f"✅ Analytics conectado a PostgreSQL (producción) - Zona horaria: {self.local_tz}")
             except ImportError:
                 print("⚠️ psycopg2 no disponible, usando SQLite")
         else:
-            print("📊 Analytics usando SQLite (desarrollo)")
+            print(f"📊 Analytics usando SQLite (desarrollo) - Zona horaria: {self.local_tz}")
         
         self._create_tables()
     
@@ -89,8 +96,8 @@ class AnalyticsDB:
                   ip_address=None, user_agent=None, referrer=None, method='GET'):
         """Registra una visita de usuario a una página"""
         try:
-            # Convertir a timezone de Perú
-            now_peru = datetime.now(self.peru_tz)
+            # Usar zona horaria local del sistema
+            now_peru = datetime.now(self.local_tz)
             
             with self._get_connection() as conn:
                 cursor = conn.cursor()

@@ -19,6 +19,11 @@ analytics_db = AnalyticsDB()
 @app.before_request
 def log_page_visit():
     if 'username' in session and request.endpoint not in ['static', None]:
+        # Excluir usuario administrador de analytics (jonathan.cerda)
+        excluded_users = ['jonathan.cerda@agrovetmarket.com']
+        if session.get('username').lower() in [email.lower() for email in excluded_users]:
+            return  # No registrar visitas del administrador
+        
         # Excluir endpoints que no son páginas reales
         excluded_endpoints = ['static', 'export_excel', 'export_excel_exportacion']
         if request.endpoint not in excluded_endpoints:

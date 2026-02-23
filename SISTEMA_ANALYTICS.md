@@ -11,7 +11,8 @@ Sistema completo de monitoreo y análisis de visitas implementado en el proyecto
 ### ✅ Tracking Automático de Visitas
 - Registro automático de todas las visitas a páginas del sistema
 - Captura de: usuario, página, timestamp, IP, user-agent, referrer
-- Timezone configurado a America/Lima (Perú)
+- Zona horaria: Detecta automáticamente la zona horaria local del sistema
+- **Exclusiones**: No se registran visitas de jonathan.cerda@agrovetmarket.com (administrador)
 
 ### ✅ Dashboard de Analytics
 - Acceso exclusivo para administradores
@@ -50,6 +51,9 @@ Sistema completo de monitoreo y análisis de visitas implementado en el proyecto
 Solo estos usuarios pueden acceder a `/analytics`:
 - jonathan.cerda@agrovetmarket.com
 - ena.fernandez@agrovetmarket.com
+
+### Exclusión de Tracking
+**Importante**: Las visitas de jonathan.cerda@agrovetmarket.com NO se registran en analytics para evitar sesgar las estadísticas.
 
 ### Botón de Acceso
 Los administradores verán un botón **📊 Analytics** en:
