@@ -10,6 +10,7 @@ Sistema web para visualización de inventario de stock desde Odoo.
 - 📤 **Exportación a Excel**: Descarga reportes con los datos filtrados
 - 🎨 **Código de colores**: Identificación visual de productos por vencimiento
 - ⚡ **Datos en tiempo real**: Conexión directa con Odoo XML-RPC
+- 📈 **Sistema de Analytics**: Monitoreo de visitas y análisis de uso (solo admins)
 
 ## Requisitos
 

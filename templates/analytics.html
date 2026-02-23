@@ -1,0 +1,486 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Asegurar que el contenedor tenga color de fondo y texto correcto */
+    body {
+        background-color: #f5f5f5 !important;
+        color: #333 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: auto !important;
+    }
+    main {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+        padding: 20px !important;
+        display: block !important;
+    }
+    .analytics-header {
+        background: linear-gradient(135deg, #875A7B, #a968a0);
+        color: white;
+        padding: 24px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .analytics-header h1 {
+        font-size: 1.8em;
+        margin-bottom: 6px;
+        color: white !important;
+    }
+    .analytics-header p {
+        font-size: 1em;
+        opacity: 0.95;
+        color: white !important;
+    }
+    .period-selector {
+        background: white;
+        padding: 14px 18px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .period-selector label {
+        font-weight: 600;
+        color: #875A7B !important;
+    }
+    .period-selector span {
+        color: #666 !important;
+    }
+    .period-selector select {
+        padding: 8px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+        background-color: white;
+        color: #333 !important;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid #875A7B;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .stat-card h3 {
+        color: #555 !important;
+        font-size: 0.75em;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    .stat-card .value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #875A7B !important;
+        margin-bottom: 4px;
+    }
+    .stat-card .subtitle {
+        color: #777 !important;
+        font-size: 0.85em;
+    }
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    .chart-container {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 18px;
+    }
+    .chart-container h2 {
+        color: #875A7B !important;
+        margin-bottom: 12px;
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+    .table-container {
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 18px;
+        overflow-x: auto;
+    }
+    .table-container h2 {
+        color: #875A7B !important;
+        margin-bottom: 14px;
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+    .analytics-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .analytics-table th {
+        background: #875A7B;
+        color: white !important;
+        padding: 10px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9em;
+    }
+    .analytics-table td {
+        padding: 10px;
+        border-bottom: 1px solid #e0e0e0;
+        color: #333 !important;
+        font-size: 0.9em;
+    }
+    .analytics-table tr:hover {
+        background: #f8f9fa;
+    }
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        background: #FFBF00;
+        color: white !important;
+        font-weight: bold;
+        font-size: 0.85em;
+    }
+    .badge-primary {
+        background: #875A7B !important;
+        color: white !important;
+    }
+    .code-url {
+        font-family: 'Courier New', monospace;
+        background: #f4f4f4;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        color: #d63384 !important;
+    }
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    @media (max-width: 1000px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .empty-message {
+        text-align: center;
+        padding: 30px 20px;
+        color: #999 !important;
+        font-style: italic;
+        font-size: 0.95em;
+    }
+    /* Asegurar que todo el contenido sea scrolleable */
+    html {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        height: 100% !important;
+        scroll-behavior: smooth;
+    }
+    .analytics-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+        padding-bottom: 40px;
+    }
+</style>
+
+<div class="analytics-container">
+<div class="analytics-header">
+    <h1>📊 Analytics del Sistema</h1>
+    <p>Monitoreo y análisis de visitas - Inventario Stock</p>
+    <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.9; color: white !important;">
+        🔽 Desplázate hacia abajo para ver gráficos detallados y tablas de actividad
+    </div>
+</div>
+
+<div class="period-selector">
+    <label for="period">📅 Período:</label>
+    <select id="period" onchange="changePeriod(this.value)">
+        <option value="7" {% if period == 7 %}selected{% endif %}>Últimos 7 días</option>
+        <option value="30" {% if period == 30 %}selected{% endif %}>Últimos 30 días</option>
+        <option value="90" {% if period == 90 %}selected{% endif %}>Últimos 90 días</option>
+    </select>
+    <span style="margin-left: auto; color: #888; font-size: 0.95em;">
+        Mostrando datos de los últimos <strong>{{ period }} días</strong>
+    </span>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total de Visitas</h3>
+        <div class="value">{{ stats.total_visits }}</div>
+        <div class="subtitle">En los últimos {{ period }} días</div>
+    </div>
+    <div class="stat-card">
+        <h3>Usuarios Únicos</h3>
+        <div class="value">{{ stats.unique_users }}</div>
+        <div class="subtitle">{{ "%.1f"|format((stats.unique_users / stats.total_allowed_users * 100) if stats.total_allowed_users > 0 else 0) }}% de {{ stats.total_allowed_users }} autorizados</div>
+    </div>
+    <div class="stat-card">
+        <h3>Promedio Visitas/Usuario</h3>
+        <div class="value">{{ "%.1f"|format(stats.total_visits / stats.unique_users if stats.unique_users > 0 else 0) }}</div>
+        <div class="subtitle">Por usuario activo</div>
+    </div>
+    <div class="stat-card">
+        <h3>Páginas Únicas</h3>
+        <div class="value">{{ stats.visits_by_page|length }}</div>
+        <div class="subtitle">Páginas visitadas</div>
+    </div>
+</div>
+
+<!-- Gráficos en Grid -->
+<div class="charts-grid">
+    <div class="chart-container">
+        <h2>📈 Visitas por Día</h2>
+        <div id="chart_visits_by_day" style="width: 100%; height: 280px;"></div>
+        {% if stats.visits_by_day|length == 0 %}
+        <div class="empty-message">No hay datos suficientes para mostrar</div>
+        {% endif %}
+    </div>
+    
+    <div class="chart-container">
+        <h2>🕒 Visitas por Hora del Día</h2>
+        <div id="chart_visits_by_hour" style="width: 100%; height: 280px;"></div>
+        {% if stats.visits_by_hour|length == 0 %}
+        <div class="empty-message">No hay datos suficientes para mostrar</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Tabla de Usuarios Más Activos -->
+<div class="table-container">
+    <h2>👥 Usuarios Más Activos</h2>
+    {% if stats.visits_by_user|length > 0 %}
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Visitas</th>
+                <th>Última Visita</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in stats.visits_by_user %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ user.user_name or 'N/A' }}</td>
+                <td>{{ user.user_email }}</td>
+                <td><span class="badge badge-primary">{{ user.visit_count }}</span></td>
+                <td>
+                    {% if user.last_visit %}
+                        {% if user.last_visit is string %}
+                            {{ user.last_visit }}
+                        {% else %}
+                            {{ user.last_visit.strftime('%d/%m/%Y %I:%M %p') }}
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-message">📊 No hay datos de usuarios en este período</div>
+    {% endif %}
+</div>
+
+<!-- Tabla de Páginas Más Visitadas -->
+<div class="table-container">
+    <h2>📄 Páginas Más Visitadas</h2>
+    {% if stats.visits_by_page|length > 0 %}
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Página</th>
+                <th>URL</th>
+                <th>Visitas</th>
+                <th>% del Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in stats.visits_by_page %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ page.page_title or 'Sin título' }}</td>
+                <td><span class="code-url">{{ page.page_url }}</span></td>
+                <td><span class="badge">{{ page.visit_count }}</span></td>
+                <td>{{ "%.1f"|format((page.visit_count / stats.total_visits * 100) if stats.total_visits > 0 else 0) }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-message">📊 No hay datos de páginas en este período</div>
+    {% endif %}
+</div>
+
+<!-- Tabla de Visitas Recientes -->
+<div class="table-container">
+    <h2>🕒 Visitas Recientes (últimas 50)</h2>
+    {% if stats.recent_visits|length > 0 %}
+    <table class="analytics-table">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Usuario</th>
+                <th>Página</th>
+                <th>IP</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in stats.recent_visits %}
+            <tr>
+                <td>
+                    {% if visit.visit_timestamp %}
+                        {% if visit.visit_timestamp is string %}
+                            {{ visit.visit_timestamp }}
+                        {% else %}
+                            {{ visit.visit_timestamp.strftime('%d/%m/%Y %I:%M:%S %p') }}
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{ visit.user_name }}</td>
+                <td><span class="code-url">{{ visit.page_url }}</span></td>
+                <td>{{ visit.ip_address or 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-message">📊 No hay visitas registradas todavía</div>
+    {% endif %}
+</div>
+
+<!-- Scripts de Google Charts -->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart', 'bar']});
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function changePeriod(days) {
+        window.location.href = '{{ url_for("analytics") }}?period=' + days;
+    }
+
+    function drawCharts() {
+        // Gráfico de Visitas por Día
+        var dataByDay = new google.visualization.DataTable();
+        dataByDay.addColumn('string', 'Fecha');
+        dataByDay.addColumn('number', 'Visitas');
+        dataByDay.addColumn('number', 'Usuarios Únicos');
+        
+        dataByDay.addRows([
+            {% for day in stats.visits_by_day %}
+            ['{{ day.visit_date }}', {{ day.visit_count }}, {{ day.unique_users }}]{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]);
+
+        {% if stats.visits_by_day|length > 0 %}
+        var optionsByDay = {
+            title: '',
+            curveType: 'function',
+            legend: { position: 'bottom', textStyle: { fontSize: 12 } },
+            colors: ['#875A7B', '#00A09D'],
+            series: {
+                0: { targetAxisIndex: 0 },
+                1: { targetAxisIndex: 1 }
+            },
+            vAxes: {
+                0: { title: 'Visitas', textStyle: { fontSize: 11 }, minValue: 0 },
+                1: { title: 'Usuarios Únicos', textStyle: { fontSize: 11 }, minValue: 0 }
+            },
+            hAxis: {
+                textStyle: { fontSize: 11 }
+            },
+            chartArea: { width: '75%', height: '65%' }
+        };
+
+        var chartByDay = new google.visualization.LineChart(document.getElementById('chart_visits_by_day'));
+        chartByDay.draw(dataByDay, optionsByDay);
+        {% endif %}
+
+        // Gráfico de Visitas por Hora
+        var dataByHour = new google.visualization.DataTable();
+        dataByHour.addColumn('string', 'Hora');
+        dataByHour.addColumn('number', 'Visitas');
+        
+        // Crear array de 24 horas con ceros
+        var hourlyData = Array.from({length: 24}, (_, i) => [i + ':00', 0]);
+        
+        // Llenar con datos reales
+        {% for hour in stats.visits_by_hour %}
+        hourlyData[{{ hour.hour }}] = ['{{ hour.hour }}:00', {{ hour.visit_count }}];
+        {% endfor %}
+        
+        dataByHour.addRows(hourlyData);
+
+        // Verificar si hay datos para mostrar
+        var hasData = hourlyData.some(function(item) { return item[1] > 0; });
+        
+        {% if stats.visits_by_hour|length > 0 %}
+        var optionsByHour = {
+            title: '',
+            legend: 'none',
+            colors: ['#875A7B'],
+            backgroundColor: '#ffffff',
+            hAxis: {
+                title: 'Hora del Día',
+                textStyle: { fontSize: 10 },
+                slantedText: false,
+                showTextEvery: 2
+            },
+            vAxis: {
+                title: 'Número de Visitas',
+                textStyle: { fontSize: 11 },
+                minValue: 0,
+                format: '0',
+                viewWindow: { min: 0 }
+            },
+            chartArea: { width: '85%', height: '70%', left: 60, right: 20, top: 20, bottom: 60 },
+            bar: { groupWidth: '80%' }
+        };
+
+        var chartByHour = new google.visualization.ColumnChart(document.getElementById('chart_visits_by_hour'));
+        chartByHour.draw(dataByHour, optionsByHour);
+        {% endif %}
+    }
+
+    // Redibujar gráficos al redimensionar ventana
+    window.addEventListener('resize', function() {
+        drawCharts();
+    });
+</script>
+
+<div style="text-align: center; padding: 20px 0; color: #888 !important;">
+    <small>Sistema de Analytics - Inventario Stock © 2026</small>
+</div>
+
+</div><!-- Fin analytics-container -->
+
+{% endblock %}

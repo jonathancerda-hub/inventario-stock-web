@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file
 from dotenv import load_dotenv
 from odoo_manager import OdooManager
+from analytics_db import AnalyticsDB
 import os
 import pandas as pd
 import io
@@ -12,6 +13,25 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 data_manager = OdooManager()
+analytics_db = AnalyticsDB()
+
+# Middleware para registrar visitas
+@app.before_request
+def log_page_visit():
+    if 'username' in session and request.endpoint not in ['static', None]:
+        # Excluir endpoints que no son páginas reales
+        excluded_endpoints = ['static', 'export_excel', 'export_excel_exportacion']
+        if request.endpoint not in excluded_endpoints:
+            analytics_db.log_visit(
+                user_email=session.get('username'),
+                user_name=session.get('username').split('@')[0],  # Nombre simple del email
+                page_url=request.path,
+                page_title=request.endpoint,
+                ip_address=request.remote_addr,
+                user_agent=request.headers.get('User-Agent'),
+                referrer=request.referrer,
+                method=request.method
+            )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -226,6 +246,43 @@ def index():
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
+@app.route('/analytics')
+def analytics():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    # Verificar permisos de administrador
+    admin_emails = [
+        'jonathan.cerda@agrovetmarket.com',
+        'ena.fernandez@agrovetmarket.com'
+    ]
+    
+    if session.get('username').lower() not in [email.lower() for email in admin_emails]:
+        flash('No tienes permisos para acceder a esta sección.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    # Obtener período solicitado
+    days = request.args.get('period', 30, type=int)
+    
+    # Recopilar todas las estadísticas
+    total_visits = analytics_db.get_total_visits(days)
+    unique_users = analytics_db.get_unique_users(days)
+    
+    # Obtener total de usuarios autorizados desde el whitelist
+    total_allowed_users = len(data_manager.whitelist) if data_manager.whitelist else 0
+    
+    stats = {
+        'total_visits': total_visits,
+        'unique_users': unique_users,
+        'total_allowed_users': total_allowed_users,
+        'visits_by_user': analytics_db.get_visits_by_user(days),
+        'visits_by_page': analytics_db.get_visits_by_page(days),
+        'visits_by_day': analytics_db.get_visits_by_day(days),
+        'visits_by_hour': analytics_db.get_visits_by_hour(min(days, 7)),
+        'recent_visits': analytics_db.get_recent_visits(50)
+    }
+    
+    return render_template('analytics.html', stats=stats, period=days)
 
 @app.route('/inventory', methods=['GET', 'POST'])
 def inventory():

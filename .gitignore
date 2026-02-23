@@ -8,6 +8,9 @@ __pycache__/
 # Lista blanca de usuarios (contiene información sensible)
 whitelist.txt
 
+# Base de datos de analytics local (SQLite)
+analytics.db
+
 # Otros archivos específicos del sistema operativo o IDE
 .DS_Store
 *.pyc
