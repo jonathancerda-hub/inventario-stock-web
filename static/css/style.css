@@ -189,11 +189,21 @@ main {
     background-color: var(--color-excel-blue-dark);
     border-color: var(--color-excel-blue-dark);
 }
-/* Estilo para el icono dentro de un botón */
-.btn i {
-    margin-right: var(--space-2);
+/* **NUEVO ESTILO**: Botón para Analytics */
+.btn.btn--analytics {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
-
+.btn.btn--analytics:hover {
+    background-color: #6b46c1;
+    border-color: #6b46c1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
 /* Estilo para el icono dentro de un botón */
 .btn i {
     margin-right: var(--space-2);

@@ -4,7 +4,6 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 import pytz
-import tzlocal
 from dateutil import parser
 
 class AnalyticsDB:
@@ -12,13 +11,9 @@ class AnalyticsDB:
         """Inicializa la conexión a la base de datos de analytics"""
         self.db_type = 'sqlite'  # Por defecto SQLite para desarrollo
         self.db_path = 'analytics.db'
-        self.table_prefix = 'inv_'  # Prefijo para tablas (evita conflictos en BD compartida)
-        # Usar zona horaria local del sistema
-        try:
-            self.local_tz = tzlocal.get_localzone()
-        except:
-            # Fallback a America/Lima si no se puede detectar
-            self.local_tz = pytz.timezone('America/Lima')
+        self.table_prefix = ''  # Sin prefijo (Supabase exclusivo para este proyecto)
+        # Usar zona horaria de Perú (America/Lima)
+        self.local_tz = pytz.timezone('America/Lima')
         self.peru_tz = self.local_tz  # Mantener peru_tz para compatibilidad
         
         # Intentar con PostgreSQL si está disponible
@@ -244,12 +239,12 @@ class AnalyticsDB:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
                     cursor.execute(f"""
-                        SELECT DATE(visit_timestamp) as visit_date, 
+                        SELECT DATE(visit_timestamp AT TIME ZONE 'America/Lima') as visit_date, 
                                COUNT(*) as visit_count,
                                COUNT(DISTINCT user_email) as unique_users
                         FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
-                        GROUP BY DATE(visit_timestamp)
+                        GROUP BY DATE(visit_timestamp AT TIME ZONE 'America/Lima')
                         ORDER BY visit_date ASC
                     """, (cutoff_date,))
                 else:
@@ -277,11 +272,11 @@ class AnalyticsDB:
                 cursor = conn.cursor()
                 if self.db_type == 'postgresql':
                     cursor.execute(f"""
-                        SELECT EXTRACT(HOUR FROM visit_timestamp) as hour, 
+                        SELECT EXTRACT(HOUR FROM visit_timestamp AT TIME ZONE 'America/Lima') as hour, 
                                COUNT(*) as visit_count
                         FROM {self.table_prefix}page_visits 
                         WHERE visit_timestamp > %s
-                        GROUP BY EXTRACT(HOUR FROM visit_timestamp)
+                        GROUP BY EXTRACT(HOUR FROM visit_timestamp AT TIME ZONE 'America/Lima')
                         ORDER BY hour ASC
                     """, (cutoff_date,))
                 else:

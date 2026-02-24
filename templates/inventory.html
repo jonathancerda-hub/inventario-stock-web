@@ -12,7 +12,9 @@
         </a>
         {% endif %}
         {% if session.get('username').lower() in ['jonathan.cerda@agrovetmarket.com', 'ena.fernandez@agrovetmarket.com'] %}
-        <a href="{{ url_for('analytics') }}" class="btn" style="background: var(--accent-color); color: white;">📊 Analytics</a>
+        <a href="{{ url_for('analytics') }}" class="btn btn--analytics">
+            <i class="bi bi-graph-up"></i> Analytics
+        </a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="btn btn--primary">Cerrar Sesión</a>
     </div>

@@ -89,6 +89,7 @@ En Render Dashboard > Environment, agrega estas variables:
 | `ODOO_USER` | Usuario con acceso a stock | `admin` |
 | `ODOO_PASSWORD` | Contraseña del usuario | `contraseña123` |
 | `WHITELIST_EMAILS` | Lista de emails autorizados (separados por comas) | Ver abajo |
+| `DATABASE_URL` | Conexión PostgreSQL de Supabase (para analytics) | Ver [SUPABASE_SETUP.md](SUPABASE_SETUP.md) |
 
 ### 2. Generar WHITELIST_EMAILS
 
@@ -138,6 +139,32 @@ El sistema usa **doble capa de seguridad**:
 - **"Acceso denegado. Usuario no autorizado"** → Email no está en la lista blanca
 - **"Usuario o contraseña incorrectos"** → Credenciales de Odoo inválidas
 
+## Sistema de Analytics
+
+El sistema incluye **monitoreo avanzado de visitas** con almacenamiento en **Supabase PostgreSQL**.
+
+### Características
+
+- 📊 **Métricas en tiempo real**: Total de visitas, usuarios únicos, visitas por página
+- 📈 **Gráficos interactivos**: Visitas por día, visitas por hora, top usuarios
+- 🔍 **Detalles granulares**: IP, user agent, referrer, method HTTP
+- 🔐 **Solo para admins**: Acceso restringido a usuarios autorizados
+- 💾 **Persistencia garantizada**: Datos almacenados en Supabase PostgreSQL
+- 🗄️ **Base de datos exclusiva**: Supabase dedicado solo a este proyecto
+
+### Configuración
+
+1. ✅ **Tabla creada**: `page_visits` en Supabase
+2. 📝 **Ver setup completo**: [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
+3. 🔧 **Variable requerida**: `DATABASE_URL` en Render Environment
+
+### Exclusión de Rastreo
+
+Los siguientes emails **no generan registros** en analytics:
+- `jonathan.cerda@agrovetmarket.com`
+
+Para agregar más exclusiones, edita `ADMIN_ANALYTICS_EMAILS` en [analytics_db.py](analytics_db.py).
+
 ## Estructura del Proyecto
 
 ```
@@ -172,6 +199,8 @@ inventario-stock/
 - 📖 **Manual de Usuario**: `manual_usuario.html` - Guía completa para usuarios finales
 - 📋 **PRD**: `PRD.html` - Product Requirements Document con arquitectura y features
 - 🚀 **Setup Render**: `RENDER_SETUP.md` - Configuración detallada para despliegue
+- 📊 **Setup Supabase**: `SUPABASE_SETUP.md` - Configuración de analytics con Supabase PostgreSQL
+- 📈 **Sistema Analytics**: `SISTEMA_ANALYTICS.md` - Documentación del sistema de monitoreo
 
 ## Características Técnicas
 
