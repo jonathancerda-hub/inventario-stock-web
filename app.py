@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from dotenv import load_dotenv
 from odoo_manager import OdooManager
 from analytics_db import AnalyticsDB
+from authlib.integrations.flask_client import OAuth
 import os
 import pandas as pd
 import io
@@ -14,6 +15,16 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 data_manager = OdooManager()
 analytics_db = AnalyticsDB()
+
+# Configuración de OAuth2 de Google con Authlib
+oauth = OAuth(app)
+google = oauth.register(
+    name="google",
+    client_id=os.getenv('GOOGLE_CLIENT_ID'),
+    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
 
 # Middleware para registrar visitas
 @app.before_request
@@ -38,29 +49,52 @@ def log_page_visit():
                 method=request.method
             )
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login')
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        
-        # Verificar primero si el usuario está en la lista blanca
-        if not data_manager.is_user_authorized(username):
-            flash('Acceso denegado. Usuario no autorizado para este sistema.', 'danger')
-            return render_template('login.html')
-        
-        # Si está autorizado, verificar credenciales
-        if data_manager.authenticate_user(username, password):
-            session['username'] = username
-            flash('¡Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('inventory'))
-        else:
-            flash('Usuario o contraseña incorrectos.', 'danger')
     return render_template('login.html')
+
+@app.route('/google-oauth')
+def google_oauth():
+    redirect_uri = url_for('authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize')
+def authorize():
+    try:
+        token = google.authorize_access_token()
+        user_info = token.get('userinfo')
+        
+        if not user_info:
+            flash('No se pudo obtener información del usuario.', 'danger')
+            return redirect(url_for('login'))
+        
+        email = user_info.get('email')
+        name = user_info.get('name')
+        picture = user_info.get('picture')
+        
+        # Verificar si el usuario está autorizado
+        if not data_manager.is_user_authorized(email):
+            flash('Acceso denegado. Solo usuarios autorizados de @agrovetmarket.com pueden acceder.', 'danger')
+            return redirect(url_for('login'))
+        
+        # Guardar la información del usuario en la sesión
+        session['username'] = email
+        session['user_name'] = name
+        session['user_picture'] = picture
+        session['user_info'] = user_info
+        
+        flash('¡Inicio de sesión exitoso!', 'success')
+        return redirect(url_for('inventory'))
+        
+    except Exception as e:
+        print(f"Error en autenticación OAuth2: {e}")
+        flash(f'Error durante la autenticación: {str(e)}', 'danger')
+        return redirect(url_for('login'))
+        return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    session.clear()
     flash('Has cerrado la sesión.', 'info')
     return redirect(url_for('login'))
 
