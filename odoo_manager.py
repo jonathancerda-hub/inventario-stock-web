@@ -310,7 +310,7 @@ class OdooManager:
                     'producto': product_data.get('display_name', ''),
                     'lugar': self._transform_location_name(self._get_related_name(quant.get('location_id'))),
                     'fecha_expira': formatted_exp_date,
-                    'cantidad_disponible': f"{quant.get('available_quantity', 0):,.0f}",
+                    'cantidad_disponible': f"{quant.get('available_quantity', 0):,.2f}",
                     'meses_expira': months_to_expire
                 })
             
@@ -372,7 +372,7 @@ class OdooManager:
                     'lugar': self._transform_location_name(self._get_related_name(quant.get('location_id'))),
                     'lote': self._get_related_name(quant.get('lot_id')),
                     'fecha_expira': formatted_exp_date,
-                    'cantidad_disponible': f"{quant.get('inventory_quantity_auto_apply', 0):,.0f}",
+                    'cantidad_disponible': f"{quant.get('inventory_quantity_auto_apply', 0):,.2f}",
                     'meses_expira': months_to_expire
                 })
             
