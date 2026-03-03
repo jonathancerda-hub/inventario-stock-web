@@ -71,18 +71,18 @@
 </div>
 
 <div class="table-container">
-    <table class="table">
+    <table class="table" id="inventoryTable">
         <thead>
             <tr>
-                <th>Linea Comercial</th>
-                <th>GrupoArticulo</th>
-                <th>CodArticulo</th>
-                <th>Producto</th>
-                <th>Lugar</th>
+                <th class="sortable" data-column="0" title="Doble clic para ordenar">Linea Comercial <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="1" title="Doble clic para ordenar">GrupoArticulo <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="2" title="Doble clic para ordenar">CodArticulo <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="3" title="Doble clic para ordenar">Producto <span class="sort-indicator"></span></th>
+                <th class="sortable" data-column="4" title="Doble clic para ordenar">Lugar <span class="sort-indicator"></span></th>
                 
-                <th class="col-no-wrap">FechaExpira</th>
-                <th class="text-center">Cantidad disponible</th>
-                <th class="text-center">Meses Expira</th>
+                <th class="col-no-wrap sortable" data-column="5" title="Doble clic para ordenar">FechaExpira <span class="sort-indicator"></span></th>
+                <th class="text-center sortable" data-column="6" data-type="number" title="Doble clic para ordenar">Cantidad disponible <span class="sort-indicator"></span></th>
+                <th class="text-center sortable" data-column="7" data-type="number" title="Doble clic para ordenar">Meses Expira <span class="sort-indicator"></span></th>
             </tr>
         </thead>
         <tbody>
@@ -102,7 +102,7 @@
                 {% elif meses is not none and 6 < meses <= 9 %}{% set status_class = 'status-yellow' %}
                 {% elif meses is not none and 9 < meses <= 12 %}{% set status_class = 'status-grey' %}
                 {% elif meses is not none and meses > 12 %}{% set status_class = 'status-green' %}{% endif %}
-                <td class="text-center {{ status_class }}">{{ meses if meses is not none else 'N/A' }}</td>
+                <td class="text-center {{ status_class }}">{{ meses if meses is not none else '' }}</td>
             </tr>
             {% else %}
             <tr>
@@ -118,6 +118,53 @@
 .status-yellow { background-color: #ffffe0; color: #bfa243; border-left: 4px solid #fffcb3; }
 .status-grey { background-color: #f0f0f0; color: #888; border-left: 4px solid #cccccc; }
 .status-green { background-color: #e3f9ed; color: #3a7d5d; border-left: 4px solid #b8f7d1; }
+
+/* Estilos para columnas ordenables */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 24px !important;
+    transition: background-color 0.2s;
+}
+
+.sortable:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sortable:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sort-indicator {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+}
+
+.sortable:hover .sort-indicator {
+    opacity: 0.7;
+}
+
+.sort-indicator::after {
+    content: '⇅';
+}
+
+.sortable.sort-asc .sort-indicator::after {
+    content: '▲';
+    opacity: 1;
+    color: #4a90e2;
+}
+
+.sortable.sort-desc .sort-indicator::after {
+    content: '▼';
+    opacity: 1;
+    color: #4a90e2;
+}
 </style>
 
 <script>
@@ -143,6 +190,97 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.submit();
             }, 800); // Espera 800ms después de que el usuario deje de escribir
         });
+    }
+
+    // Funcionalidad de ordenamiento de tabla
+    const table = document.getElementById('inventoryTable');
+    if (table) {
+        const headers = table.querySelectorAll('th.sortable');
+        let currentSort = { column: -1, ascending: true };
+
+        headers.forEach(header => {
+            header.addEventListener('dblclick', function() {
+                const columnIndex = parseInt(this.dataset.column);
+                const dataType = this.dataset.type || 'string';
+                
+                // Determinar dirección del ordenamiento
+                if (currentSort.column === columnIndex) {
+                    currentSort.ascending = !currentSort.ascending;
+                } else {
+                    currentSort.ascending = true;
+                    currentSort.column = columnIndex;
+                }
+
+                // Remover clases de ordenamiento de todas las cabeceras
+                headers.forEach(h => {
+                    h.classList.remove('sort-asc', 'sort-desc');
+                });
+
+                // Agregar clase apropiada a la cabecera actual
+                this.classList.add(currentSort.ascending ? 'sort-asc' : 'sort-desc');
+
+                // Ordenar la tabla
+                sortTable(columnIndex, dataType, currentSort.ascending);
+            });
+        });
+
+        function sortTable(columnIndex, dataType, ascending) {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Filtrar la fila de "No se encontraron productos"
+            const dataRows = rows.filter(row => row.cells.length > 1);
+            
+            if (dataRows.length === 0) return;
+
+            dataRows.sort((a, b) => {
+                let aValue = a.cells[columnIndex].textContent.trim();
+                let bValue = b.cells[columnIndex].textContent.trim();
+
+                // Si es la columna de Producto (índice 3), eliminar el código entre corchetes
+                if (columnIndex === 3) {
+                    const removeCode = (text) => {
+                        const match = text.match(/\]\s*(.+)/);
+                        return match ? match[1].trim() : text;
+                    };
+                    aValue = removeCode(aValue);
+                    bValue = removeCode(bValue);
+                }
+
+                // Manejar valores vacíos
+                if (!aValue) aValue = ascending ? '' : 'zzzzzz';
+                if (!bValue) bValue = ascending ? '' : 'zzzzzz';
+
+                let comparison = 0;
+
+                if (dataType === 'number') {
+                    // Limpiar formato de números (quitar comas)
+                    const aNum = parseFloat(aValue.replace(/,/g, '')) || 0;
+                    const bNum = parseFloat(bValue.replace(/,/g, '')) || 0;
+                    comparison = aNum - bNum;
+                } else if (columnIndex === 5) {
+                    // Fecha en formato DD-MM-YYYY
+                    const parseDate = (dateStr) => {
+                        if (!dateStr) return new Date(0);
+                        const parts = dateStr.split('-');
+                        if (parts.length === 3) {
+                            return new Date(parts[2], parts[1] - 1, parts[0]);
+                        }
+                        return new Date(0);
+                    };
+                    comparison = parseDate(aValue) - parseDate(bValue);
+                } else {
+                    // Comparación de strings (case insensitive)
+                    comparison = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
+                }
+
+                return ascending ? comparison : -comparison;
+            });
+
+            // Limpiar y re-agregar las filas ordenadas
+            dataRows.forEach(row => tbody.removeChild(row));
+            dataRows.forEach(row => tbody.appendChild(row));
+        }
     }
 });
 </script>
