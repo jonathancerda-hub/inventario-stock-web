@@ -83,8 +83,23 @@ def authorize():
         session['user_picture'] = picture
         session['user_info'] = user_info
         
+        # Usuarios con acceso al dashboard como primera vista
+        dashboard_users = [
+            'umberto.calderon@agrovetmarket.com',
+            'sandra.meneses@agrovetmarket.com',
+            'jimena.delrisco@agrovetmarket.com',
+            'johanna.hurtado@agrovetmarket.com',
+            'ena.fernandez@agrovetmarket.com',
+            'jonathan.cerda@agrovetmarket.com'
+        ]
+        
         flash('¡Inicio de sesión exitoso!', 'success')
-        return redirect(url_for('inventory'))
+        
+        # Redirigir al dashboard si el usuario está en la lista, sino al inventario
+        if email.lower() in [user.lower() for user in dashboard_users]:
+            return redirect(url_for('dashboard'))
+        else:
+            return redirect(url_for('inventory'))
         
     except Exception as e:
         print(f"Error en autenticación OAuth2: {e}")
@@ -214,6 +229,20 @@ def export_excel():
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'username' not in session: return redirect(url_for('login'))
+    
+    # Verificar permisos de acceso al dashboard
+    dashboard_users = [
+        'umberto.calderon@agrovetmarket.com',
+        'sandra.meneses@agrovetmarket.com',
+        'jimena.delrisco@agrovetmarket.com',
+        'johanna.hurtado@agrovetmarket.com',
+        'ena.fernandez@agrovetmarket.com',
+        'jonathan.cerda@agrovetmarket.com'
+    ]
+    
+    if session.get('username').lower() not in [user.lower() for user in dashboard_users]:
+        flash('No tienes permisos para acceder al dashboard.', 'warning')
+        return redirect(url_for('inventory'))
 
     if request.method == 'POST':
         return redirect(url_for('dashboard', 

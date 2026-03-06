@@ -1,22 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<header class="page-header">
-    <h1 class="page-title">Inventario de Stock</h1>
-    <h3 class="page-greeting" style="font-size:0.95em; color:#444; margin-top:6px;">Hola, {{ session.get('username') }}</h3>
-    <div style="display: flex; gap: var(--space-2);">
-        <a href="{{ url_for('dashboard') }}" class="btn">Ver Dashboard</a>
+<header class="page-header" style="padding: var(--space-2) var(--space-4); min-height: auto;">
+    <div>
+        <h1 class="page-title" style="font-size: 1.5rem; margin-bottom: 4px;">Inventario de Stock</h1>
+        <div style="font-size:0.75em; color:#666; line-height: 1.3;">
+            <span>{{ session.get('username') }}</span> | 
+            <span id="currentDateTime"></span> | 
+            <span>Actualizado: <span id="lastUpdate">--</span></span>
+        </div>
+    </div>
+    <div style="display: flex; gap: var(--space-2); align-items: center;">
+        {% if session.get('username').lower() in ['umberto.calderon@agrovetmarket.com', 'sandra.meneses@agrovetmarket.com', 'jimena.delrisco@agrovetmarket.com', 'johanna.hurtado@agrovetmarket.com', 'ena.fernandez@agrovetmarket.com', 'jonathan.cerda@agrovetmarket.com'] %}
+        <a href="{{ url_for('dashboard') }}" class="btn" style="padding: 6px 12px; font-size: 0.875rem;">Ver Dashboard</a>
+        {% endif %}
         {% if can_download %}
-        <a href="{{ url_for('export_excel', **selected_filters) }}" class="btn btn--excel">
+        <a href="{{ url_for('export_excel', **selected_filters) }}" class="btn btn--excel" style="padding: 6px 12px; font-size: 0.875rem;">
             <i class="bi bi-file-earmark-spreadsheet"></i> Descargar Excel
         </a>
         {% endif %}
         {% if session.get('username').lower() in ['jonathan.cerda@agrovetmarket.com', 'ena.fernandez@agrovetmarket.com'] %}
-        <a href="{{ url_for('analytics') }}" class="btn btn--analytics">
+        <a href="{{ url_for('analytics') }}" class="btn btn--analytics" style="padding: 6px 12px; font-size: 0.875rem;">
             <i class="bi bi-graph-up"></i> Analytics
         </a>
         {% endif %}
-        <a href="{{ url_for('logout') }}" class="btn btn--primary">Cerrar Sesión</a>
+        <a href="{{ url_for('logout') }}" class="btn btn--primary" style="padding: 6px 12px; font-size: 0.875rem;">Cerrar Sesión</a>
     </div>
 </header>
 
@@ -170,6 +178,30 @@
 <script>
 // Auto-submit del formulario cuando cambian los filtros
 document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar fecha y hora actual
+    function updateDateTime() {
+        const now = new Date();
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit'
+        };
+        const dateTimeStr = now.toLocaleDateString('es-ES', options);
+        document.getElementById('currentDateTime').textContent = dateTimeStr;
+        
+        // Actualizar última actualización (hora de carga)
+        const timeStr = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('lastUpdate').textContent = timeStr;
+    }
+    
+    // Actualizar al cargar la página
+    updateDateTime();
+    
+    // Actualizar cada minuto
+    setInterval(updateDateTime, 60000);
+    
     const form = document.querySelector('.filter-bar form');
     const selects = form.querySelectorAll('select');
     const searchInput = form.querySelector('input[name="search_term"]');
@@ -178,6 +210,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-submit cuando cambian los selects
     selects.forEach(select => {
         select.addEventListener('change', function() {
+            // Guardar hora antes de enviar
+            sessionStorage.setItem('lastUpdateTime', new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
             form.submit();
         });
     });
@@ -187,9 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
+                sessionStorage.setItem('lastUpdateTime', new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
                 form.submit();
             }, 800); // Espera 800ms después de que el usuario deje de escribir
         });
+    }
+    
+    // Restaurar última actualización si existe
+    const savedUpdateTime = sessionStorage.getItem('lastUpdateTime');
+    if (savedUpdateTime) {
+        document.getElementById('lastUpdate').textContent = savedUpdateTime;
     }
 
     // Funcionalidad de ordenamiento de tabla
