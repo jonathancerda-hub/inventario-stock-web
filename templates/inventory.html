@@ -14,11 +14,6 @@
         {% if session.get('username').lower() in ['umberto.calderon@agrovetmarket.com', 'sandra.meneses@agrovetmarket.com', 'jimena.delrisco@agrovetmarket.com', 'johanna.hurtado@agrovetmarket.com', 'ena.fernandez@agrovetmarket.com', 'jonathan.cerda@agrovetmarket.com'] %}
         <a href="{{ url_for('dashboard') }}" class="btn" style="padding: 6px 12px; font-size: 0.875rem;">Ver Dashboard</a>
         {% endif %}
-        {% if can_download %}
-        <a href="{{ url_for('export_excel', **selected_filters) }}" class="btn btn--excel" style="padding: 6px 12px; font-size: 0.875rem;">
-            <i class="bi bi-file-earmark-spreadsheet"></i> Descargar Excel
-        </a>
-        {% endif %}
         {% if session.get('username').lower() in ['jonathan.cerda@agrovetmarket.com', 'ena.fernandez@agrovetmarket.com'] %}
         <a href="{{ url_for('analytics') }}" class="btn btn--analytics" style="padding: 6px 12px; font-size: 0.875rem;">
             <i class="bi bi-graph-up"></i> Analytics
