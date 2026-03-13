@@ -168,19 +168,52 @@ class OdooManager:
         self.models = None
         self.is_connected = False
         self.whitelist = self._load_whitelist()
-        try:
-            common_url = f'{self.url}/xmlrpc/2/common'
-            models_url = f'{self.url}/xmlrpc/2/object'
-            common = xmlrpc.client.ServerProxy(common_url)
-            self.uid = common.authenticate(self.db, self.user, self.password, {})
-            if self.uid:
-                self.models = xmlrpc.client.ServerProxy(models_url)
-                self.is_connected = True
-                print("Conexión principal a Odoo establecida con xmlrpc.client.")
-            else:
-                 print("Error de autenticación en la conexión principal.")
-        except Exception as e:
-            print(f"Error en la conexión principal a Odoo: {e}")
+        self._connect_to_odoo()
+
+    def _connect_to_odoo(self):
+        """Establece conexión con Odoo con reintentos y mejor manejo de errores"""
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries and not self.is_connected:
+            try:
+                common_url = f'{self.url}/xmlrpc/2/common'
+                models_url = f'{self.url}/xmlrpc/2/object'
+                common = xmlrpc.client.ServerProxy(common_url)
+                
+                # Intentar autenticación
+                self.uid = common.authenticate(self.db, self.user, self.password, {})
+                
+                if self.uid:
+                    self.models = xmlrpc.client.ServerProxy(models_url)
+                    self.is_connected = True
+                    print(f"✅ Conexión a Odoo establecida exitosamente (usuario: {self.user})")
+                    return
+                else:
+                    print(f"⚠️ Error de autenticación con Odoo - credenciales incorrectas")
+                    break  # No reintentar si las credenciales son incorrectas
+                    
+            except xmlrpc.client.Fault as e:
+                # Error específico de Odoo (típicamente del módulo cs_login_audit_log)
+                if 'RuntimeError: object unbound' in str(e) or 'cs_login_audit_log' in str(e):
+                    print(f"⚠️ Error conocido en módulo Odoo (cs_login_audit_log) - intento {retry_count + 1}/{max_retries}")
+                    print(f"   Este error es del servidor Odoo y no afecta la funcionalidad de la app")
+                    retry_count += 1
+                    if retry_count < max_retries:
+                        import time
+                        time.sleep(1)  # Esperar 1 segundo antes de reintentar
+                    continue
+                else:
+                    print(f"❌ Error XML-RPC en Odoo: {str(e)[:200]}")
+                    break
+                    
+            except Exception as e:
+                print(f"❌ Error conectando a Odoo: {type(e).__name__}: {str(e)[:200]}")
+                break
+        
+        if not self.is_connected:
+            print(f"⚠️ No se pudo establecer conexión con Odoo. La app funcionará en modo limitado.")
+            print(f"   Contacta al administrador de Odoo para revisar el módulo cs_login_audit_log")
 
     def _load_whitelist(self):
         """Carga la lista blanca de usuarios autorizados desde variable de entorno o whitelist.txt"""
