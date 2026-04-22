@@ -171,36 +171,79 @@ Para agregar más exclusiones, edita `ADMIN_ANALYTICS_EMAILS` en [analytics_db.p
 inventario-stock/
 ├── app.py                      # Aplicación Flask principal
 ├── odoo_manager.py             # Lógica de conexión y consultas Odoo
-├── conectar_odoo.py            # Script de prueba de conexión
-├── generate_whitelist_env.py   # Generador de string para Render
+├── analytics_db.py             # Gestor de base de datos analytics (Supabase)
+├── config.py                   # Configuración centralizada de la app
+├── schemas.py                  # Esquemas de validación (Pydantic)
+├── logging_config.py           # Configuración de logging
+├── roles.json                  # Control de acceso por roles
 ├── requirements.txt            # Dependencias Python
+├── pyproject.toml              # Configuración del proyecto Python
+├── pytest.ini                  # Configuración de pytest
 ├── .env                        # Variables de entorno (local, git-ignored)
-├── whitelist.txt              # Lista de emails autorizados (local, git-ignored)
-├── whitelist.txt.example      # Plantilla de whitelist
-├── .gitignore                 # Archivos ignorados por git
-├── templates/                 # Plantillas HTML
-│   ├── base.html
-│   ├── login.html
-│   ├── inventory.html
-│   ├── dashboard.html
-│   └── export_inventory.html
-├── static/                    # Archivos estáticos
+├── .env.example                # Plantilla de variables de entorno
+├── whitelist.txt               # Lista de emails autorizados (local, git-ignored)
+├── whitelist.txt.example       # Plantilla de whitelist
+├── .gitignore                  # Archivos ignorados por git
+├── templates/                  # Plantillas HTML (Jinja2)
+│   ├── base.html               # Plantilla base
+│   ├── login.html              # Página de login
+│   ├── inventory.html          # Vista de inventario
+│   ├── dashboard.html          # Dashboard principal
+│   ├── analytics.html          # Vista de analytics
+│   └── export_inventory.html  # Exportación de inventario
+├── static/                     # Archivos estáticos
 │   ├── css/
-│   │   └── style.css
+│   │   └── style.css           # Estilos CSS
 │   └── js/
-│       └── script.js
-├── manual_usuario.html        # Manual de usuario completo
-├── PRD.html                   # Documento de requerimientos del producto
-└── RENDER_SETUP.md           # Guía de configuración para Render
+│       └── script.js           # JavaScript del cliente
+├── scripts/                    # Scripts de utilidad
+│   ├── README.md               # Documentación de scripts
+│   ├── migrate_data_to_pro.py  # Migración a Supabase Pro
+│   └── validate_migration.py   # Validación de migración
+├── sql/                        # Scripts SQL
+│   ├── README.md               # Documentación SQL
+│   ├── create_analytics_table.sql       # Creación tabla analytics
+│   └── migrate_supabase_pro.sql         # Migración completa
+├── docs/                       # Documentación técnica
+│   ├── CODE_REVIEW_SENIOR.md   # Code review senior
+│   ├── PRD.html                # Product Requirements Document
+│   ├── manual_usuario.html     # Manual de usuario
+│   ├── PLAN_MODULO_ADMIN_PERMISOS.md   # Plan módulo admin
+│   ├── PLAN_MIGRACION_SUPABASE_PRO.md  # Plan migración Supabase
+│   ├── GUIA_AUTENTICACION_GOOGLE.md    # Guía OAuth Google
+│   └── capacitaciones/         # Certificados de capacitación
+└── tests/                      # Tests automatizados
+    ├── conftest.py             # Configuración pytest
+    ├── test_app_routes.py      # Tests de rutas
+    ├── test_analytics_db.py    # Tests de analytics
+    ├── test_odoo_manager.py    # Tests de Odoo
+    └── test_schemas.py         # Tests de schemas
 ```
 
 ## Documentación
 
-- 📖 **Manual de Usuario**: `manual_usuario.html` - Guía completa para usuarios finales
-- 📋 **PRD**: `PRD.html` - Product Requirements Document con arquitectura y features
-- 🚀 **Setup Render**: `RENDER_SETUP.md` - Configuración detallada para despliegue
-- 📊 **Setup Supabase**: `SUPABASE_SETUP.md` - Configuración de analytics con Supabase PostgreSQL
-- 📈 **Sistema Analytics**: `SISTEMA_ANALYTICS.md` - Documentación del sistema de monitoreo
+### 📚 Guías de Usuario y Configuración
+- 📖 **Manual de Usuario**: [docs/manual_usuario.html](docs/manual_usuario.html) - Guía completa para usuarios finales
+- 📋 **PRD**: [docs/PRD.html](docs/PRD.html) - Product Requirements Document con arquitectura y features
+- 🔐 **Autenticación Google**: [docs/GUIA_AUTENTICACION_GOOGLE.md](docs/GUIA_AUTENTICACION_GOOGLE.md) - Configuración OAuth 2.0
+- 🏗️ **Code Review**: [docs/CODE_REVIEW_SENIOR.md](docs/CODE_REVIEW_SENIOR.md) - Análisis de código por senior developer
+
+### 🗄️ Base de Datos y Migraciones
+- 🎯 **Guía Rápida**: [docs/MIGRACION_README.md](docs/MIGRACION_README.md) - Quick start migración (30 min)
+- 📋 **Plan Completo**: [docs/PLAN_MIGRACION_SUPABASE_PRO.md](docs/PLAN_MIGRACION_SUPABASE_PRO.md) - Plan detallado de 7 fases
+- 🔧 **Scripts de Migración**:
+  - [sql/migrate_supabase_pro.sql](sql/migrate_supabase_pro.sql) - Script SQL para crear estructura
+  - [scripts/migrate_data_to_pro.py](scripts/migrate_data_to_pro.py) - Script Python para migrar datos
+  - [scripts/validate_migration.py](scripts/validate_migration.py) - Validación post-migración
+
+### 🛡️ Seguridad y Capacitación
+- 🔒 **Informe de Auditoría**: `INFORME_AUDITORIA_SEGURIDAD.html` - Auditoría completa OWASP + ISO 27001 (88/100)
+- 🎓 **Capacitaciones**: [docs/capacitaciones/](docs/capacitaciones/) - 12 certificados en seguridad y DevSecOps
+
+### 🚀 Desarrollo y Deploy
+- 📊 **Módulo Admin**: [docs/PLAN_MODULO_ADMIN_PERMISOS.md](docs/PLAN_MODULO_ADMIN_PERMISOS.md) - Plan de desarrollo módulo de administración
+- 🔨 **Scripts Utilidad**: [scripts/README.md](scripts/README.md) - Documentación de scripts de mantenimiento
+- 💾 **Scripts SQL**: [sql/README.md](sql/README.md) - Documentación de esquemas y migraciones
 
 ## Características Técnicas
 

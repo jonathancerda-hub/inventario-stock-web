@@ -18,22 +18,22 @@
     <form method="POST" action="{{ url_for('inventory_export') }}">
         <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end;">
             <div>
-                <label for="grupo_id">Grupo Artículo</label>
-                <select name="grupo_id" id="grupo_id" class="form-control">
+                <label for="category_id">Grupo Artículo</label>
+                <select name="category_id" id="category_id" class="form-control">
                     <option value="">Todos</option>
                     {% for grupo in filter_options.grupos %}
-                        <option value="{{ grupo.id }}" {% if grupo.id == selected_filters.grupo_id %}selected{% endif %}>
+                        <option value="{{ grupo.id }}" {% if grupo.id == selected_filters.category_id %}selected{% endif %}>>
                             {{ grupo.display_name }}
                         </option>
                     {% endfor %}
                 </select>
             </div>
             <div>
-                <label for="linea_id">Línea Comercial</label>
-                <select name="linea_id" id="linea_id" class="form-control">
+                <label for="line_id">Línea Comercial</label>
+                <select name="line_id" id="line_id" class="form-control">
                     <option value="">Todas</option>
                     {% for linea in filter_options.lineas %}
-                        <option value="{{ linea.id }}" {% if linea.id == selected_filters.linea_id %}selected{% endif %}>
+                        <option value="{{ linea.id }}" {% if linea.id == selected_filters.line_id %}selected{% endif %}>
                             {{ linea.display_name }}
                         </option>
                     {% endfor %}
@@ -57,7 +57,6 @@
                 <th>Linea Comercial</th>
                 <th>CodArticulo</th>
                 <th>Producto</th>
-                
                 <th>Lugar</th>
                 <th>Lote</th>
                 <th class="col-no-wrap">FechaExpira</th>
@@ -72,7 +71,6 @@
                 <td>{{ item.linea_comercial }}</td>
                 <td>{{ item.cod_articulo }}</td>
                 <td>{{ item.producto }}</td>
-                
                 <td>{{ item.lugar }}</td>
                 <td>{{ item.lote }}</td>
                 <td class="col-no-wrap">{{ item.fecha_expira }}</td>
@@ -84,7 +82,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="10" style="text-align: center; padding: var(--space-4);">No se encontraron productos.</td>
+                <td colspan="9" style="text-align: center; padding: var(--space-4);">No se encontraron productos.</td>
             </tr>
             {% endfor %}
         </tbody>

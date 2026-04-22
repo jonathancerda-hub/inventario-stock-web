@@ -18,6 +18,9 @@
         <a href="{{ url_for('analytics') }}" class="btn btn--analytics" style="padding: 6px 12px; font-size: 0.875rem;">
             <i class="bi bi-graph-up"></i> Analytics
         </a>
+        <a href="{{ url_for('admin_users') }}" class="btn btn--danger" style="padding: 6px 12px; font-size: 0.875rem;">
+            <i class="bi bi-shield-lock"></i> Admin
+        </a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="btn btn--primary" style="padding: 6px 12px; font-size: 0.875rem;">Cerrar Sesión</a>
     </div>
@@ -28,11 +31,11 @@
         <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end;">
             
             <div>
-                <label for="linea_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Línea Comercial</label>
-                <select name="linea_id" id="linea_id" class="form-control">
+                <label for="line_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Línea Comercial</label>
+                <select name="line_id" id="line_id" class="form-control">
                     <option value="">Todas</option>
                     {% for linea in filter_options.lineas %}
-                        <option value="{{ linea.id }}" {% if linea.id == selected_filters.linea_id %}selected{% endif %}>
+                        <option value="{{ linea.id }}" {% if linea.id == selected_filters.line_id %}selected{% endif %}>>
                             {{ linea.display_name }}
                         </option>
                     {% endfor %}
@@ -40,11 +43,11 @@
             </div>
             
             <div>
-                <label for="grupo_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Grupo Artículo</label>
-                <select name="grupo_id" id="grupo_id" class="form-control">
+                <label for="category_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Grupo Artículo</label>
+                <select name="category_id" id="category_id" class="form-control">
                     <option value="">Todos</option>
                     {% for grupo in filter_options.grupos %}
-                        <option value="{{ grupo.id }}" {% if grupo.id == selected_filters.grupo_id %}selected{% endif %}>
+                        <option value="{{ grupo.id }}" {% if grupo.id == selected_filters.category_id %}selected{% endif %}>>
                             {{ grupo.display_name }}
                         </option>
                     {% endfor %}
@@ -52,11 +55,11 @@
             </div>
 
             <div>
-                <label for="lugar_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Lugar</label>
-                <select name="lugar_id" id="lugar_id" class="form-control">
+                <label for="location_id" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: block;">Lugar</label>
+                <select name="location_id" id="location_id" class="form-control">
                     <option value="">Todos (def. Comercial)</option>
                     {% for lugar in filter_options.lugares %}
-                        <option value="{{ lugar.id }}" {% if lugar.id == selected_filters.lugar_id %}selected{% endif %}>
+                        <option value="{{ lugar.id }}" {% if lugar.id == selected_filters.location_id %}selected{% endif %}>>
                             {{ lugar.display_name }}
                         </option>
                     {% endfor %}

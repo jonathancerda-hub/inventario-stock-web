@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD - Sistema de Inventario Stock Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .meta-item { text-align: center; }
+        .meta-label { font-weight: bold; color: #667eea; display: block; margin-bottom: 5px; }
+        .section { margin: 40px 0; }
+        h2 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.8em; }
+        h3 { color: #764ba2; margin: 25px 0 15px 0; font-size: 1.4em; }
+        h4 { color: #555; margin: 20px 0 10px 0; font-size: 1.1em; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th { background: #667eea; color: white; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; }
+        tr:hover { background: #f8f9fa; }
+        .priority-high { color: #dc3545; font-weight: bold; }
+        .priority-medium { color: #ffc107; font-weight: bold; }
+        .priority-low { color: #28a745; font-weight: bold; }
+        .req-box { background: #e7f3ff; border-left: 4px solid #667eea; padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .req-id { font-weight: bold; color: #667eea; }
+        ul, ol { margin-left: 30px; margin-top: 10px; }
+        li { margin: 8px 0; }
+        .tech-stack { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; }
+        .tech-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea; }
+        .tech-card h4 { margin-top: 0; color: #667eea; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .feature-card { background: #fff; border: 2px solid #e0e0e0; padding: 20px; border-radius: 8px; transition: all 0.3s; }
+        .feature-card:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102,126,234,0.2); }
+        .icon { font-size: 2em; margin-bottom: 10px; }
+        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
+        .status-active { background: #28a745; color: white; }
+        .status-planned { background: #ffc107; color: #333; }
+        .architecture-diagram { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; font-family: monospace; white-space: pre; overflow-x: auto; }
+        .footer { text-align: center; padding: 30px; background: #f8f9fa; border-radius: 0 0 8px 8px; margin-top: 40px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 PRD - Sistema de Inventario Stock Web</h1>
+            <p class="subtitle">Product Requirements Document - Ingeniería de Requisitos</p>
+        </header>
+
+        <div class="meta">
+            <div class="meta-item">
+                <span class="meta-label">📅 Fecha de Creación</span>
+                8 de abril de 2026
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">� Última Actualización</span>
+                22 de abril de 2026
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">👤 Autor</span>
+                Jonathan Cerda
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">🏢 Organización</span>
+                Agrovet Market
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">📌 Versión</span>
+                2.2 (Sistema de Permisos 100% BD)
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">🎯 Estado</span>
+                <span class="status-badge status-active">ACTIVO</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">🔗 Despliegue</span>
+                Render.com (Pro)
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: RESUMEN EJECUTIVO -->
+        <section class="section">
+            <h2>1. Resumen Ejecutivo</h2>
+            
+            <h3>1.1 Visión del Producto</h3>
+            <p>Sistema web centralizado para visualización y análisis de inventario en tiempo real, integrado con Odoo ERP, que permite a usuarios autorizados monitorear stock, fechas de vencimiento y tomar decisiones basadas en datos actualizados.</p>
+
+            <h3>1.2 Objetivos del Negocio</h3>
+            <ul>
+                <li><strong>Reducir pérdidas por vencimiento:</strong> Identificación temprana de productos próximos a vencer (0-3 meses)</li>
+                <li><strong>Centralizar información:</strong> Consolidar datos de múltiples ubicaciones en una sola interfaz</li>
+                <li><strong>Mejorar eficiencia operativa:</strong> Reducir tiempo de consulta de inventario de 15 min a <30 segundos</li>
+                <li><strong>Facilitar análisis:</strong> Dashboard con 6 gráficos interactivos y exportación a Excel</li>
+                <li><strong>Control de acceso granular:</strong> Sistema RBAC con 4 roles y permisos específicos por funcionalidad</li>
+            </ul>
+
+            <h3>1.3 Métricas de Éxito (KPIs)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Objetivo</th>
+                        <th>Estado Actual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Usuarios activos mensuales</td>
+                        <td>35+</td>
+                        <td>✅ 40+ usuarios</td>
+                    </tr>
+                    <tr>
+                        <td>Tiempo de respuesta promedio</td>
+                        <td>&lt; 2 segundos</td>
+                        <td>✅ 1.5 segundos</td>
+                    </tr>
+                    <tr>
+                        <td>Uptime del sistema</td>
+                        <td>≥ 99%</td>
+                        <td>✅ 99.8%</td>
+                    </tr>
+                    <tr>
+                        <td>Consultas diarias</td>
+                        <td>100+</td>
+                        <td>✅ 150+ consultas/día</td>
+                    </tr>
+                    <tr>
+                        <td>Exportaciones Excel/semana</td>
+                        <td>50+</td>
+                        <td>✅ 80+ exportaciones</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECCIÓN 2: STAKEHOLDERS -->
+        <section class="section">
+            <h2>2. Stakeholders y Usuarios</h2>
+
+            <h3>2.1 Stakeholders Principales</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rol</th>
+                        <th>Nombre/Área</th>
+                        <th>Responsabilidad</th>
+                        <th>Nivel de Influencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Product Owner</td>
+                        <td>Jonathan Cerda</td>
+                        <td>Desarrollo, despliegue, mantenimiento</td>
+                        <td>🔴 Alto</td>
+                    </tr>
+                    <tr>
+                        <td>Tech Lead</td>
+                        <td>Ena Fernández</td>
+                        <td>Supervisión técnica, analytics</td>
+                        <td>🔴 Alto</td>
+                    </tr>
+                    <tr>
+                        <td>Usuarios Finales</td>
+                        <td>Equipo de Operaciones</td>
+                        <td>Consulta diaria de inventario</td>
+                        <td>🟡 Medio</td>
+                    </tr>
+                    <tr>
+                        <td>Usuarios Dashboard</td>
+                        <td>6 gerentes clave</td>
+                        <td>Análisis de KPIs y tendencias</td>
+                        <td>🟡 Medio</td>
+                    </tr>
+                    <tr>
+                        <td>Administradores</td>
+                        <td>Jonathan, Ena</td>
+                        <td>Monitoreo de analytics y seguridad</td>
+                        <td>🔴 Alto</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 Perfiles de Usuario</h3>
+            
+            <h4>👤 Usuario Estándar (35+ usuarios)</h4>
+            <ul>
+                <li><strong>Rol:</strong> Operador, Asistente de Almacén, Analista</li>
+                <li><strong>Objetivos:</strong> Consultar stock, verificar vencimientos, exportar reportes</li>
+                <li><strong>Frecuencia de uso:</strong> 3-5 veces por día</li>
+                <li><strong>Permisos:</strong> /inventory, /exportacion, exportar Excel</li>
+            </ul>
+
+            <h4>📊 Usuario Dashboard (6 usuarios)</h4>
+            <ul>
+                <li><strong>Rol:</strong> Gerente de Operaciones, Jefe de Almacén</li>
+                <li><strong>Objetivos:</strong> Análisis de tendencias, KPIs, toma de decisiones</li>
+                <li><strong>Frecuencia de uso:</strong> 1-2 veces por día</li>
+                <li><strong>Permisos:</strong> Todo lo anterior + /dashboard con 6 gráficos</li>
+            </ul>
+
+            <h4>🔧 Administrador (2 usuarios)</h4>
+            <ul>
+                <li><strong>Rol:</strong> IT, Desarrollador</li>
+                <li><strong>Objetivos:</strong> Monitoreo de sistema, analytics de usuarios, troubleshooting</li>
+                <li><strong>Frecuencia de uso:</strong> 2-3 veces por semana</li>
+                <li><strong>Permisos:</strong> Todo lo anterior + /analytics</li>
+            </ul>
+        </section>
+
+        <!-- SECCIÓN 3: REQUISITOS FUNCIONALES -->
+        <section class="section">
+            <h2>3. Requisitos Funcionales</h2>
+
+            <h3>3.1 Autenticación y Autorización</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-001</span> - <strong>Autenticación OAuth 2.0 con Google</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> El sistema debe autenticar usuarios mediante Google OAuth 2.0</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Criterios de aceptación:</strong>
+                        <ul>
+                            <li>Redirección automática a Google Login</li>
+                            <li>Intercambio seguro de tokens OAuth</li>
+                            <li>Validación de usuario en base de datos post-autenticación</li>
+                            <li>Verificación de estado activo del usuario</li>
+                            <li>Registro automático del último login</li>
+                            <li>Creación de sesión persistente con rol del usuario (15 min de inactividad)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> Authlib 1.6.8, endpoints /google-oauth y /authorize</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-002</span> - <strong>Control de Acceso por Base de Datos</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Solo usuarios registrados y activos en la base de datos pueden acceder al sistema</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Criterios de aceptación:</strong>
+                        <ul>
+                            <li>Usuarios registrados en tabla inventario_user_permissions (PostgreSQL/Supabase)</li>
+                            <li>Validación de estado activo (is_active=true)</li>
+                            <li>Registro automático del último login (last_login)</li>
+                            <li>Mensaje de error claro para usuarios no registrados o inactivos</li>
+                            <li>Log completo de intentos de acceso en tabla inventario_audit_log</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> permissions_manager.get_user_details() y permissions_manager.update_last_login()</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-003</span> - <strong>Autorización por Niveles (3 niveles)</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Control granular de permisos según rol de usuario</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Niveles:</strong>
+                        <ul>
+                            <li><strong>Nivel 1 (General):</strong> /inventory, /exportacion</li>
+                            <li><strong>Nivel 2 (Dashboard):</strong> Nivel 1 + /dashboard</li>
+                            <li><strong>Nivel 3 (Admin):</strong> Nivel 2 + /analytics</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> roles.json + decoradores @require_auth + @dashboard_required</li>
+                </ul>
+            </div>
+
+            <h3>3.2 Visualización de Inventario</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-004</span> - <strong>Vista de Inventario Tabular con Filtros</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Tabla interactiva con datos de stock en tiempo real</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Columnas obligatorias:</strong>
+                        <ul>
+                            <li>Código de producto</li>
+                            <li>Nombre del producto</li>
+                            <li>Cantidad disponible</li>
+                            <li>Fecha de vencimiento</li>
+                            <li>Meses para expirar</li>
+                            <li>Ubicación</li>
+                            <li>Lote</li>
+                            <li>Línea comercial</li>
+                            <li>Categoría (Grupo Artículo)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Filtros disponibles:</strong> Línea comercial, Categoría, Ubicación, Búsqueda libre</li>
+                    <li><strong>Código de colores por vencimiento:</strong>
+                        <ul>
+                            <li>🔴 Rojo: 0-3 meses (Crítico)</li>
+                            <li>🟠 Ámbar: 3-6 meses (Advertencia)</li>
+                            <li>🟡 Amarillo: 6-9 meses (Precaución)</li>
+                            <li>⚪ Gris: 9-12 meses (Estable)</li>
+                            <li>🟢 Verde: >12 meses (Óptimo)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-005</span> - <strong>Dashboard Interactivo con 6 Gráficos</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Panel de control con visualizaciones de datos agregados</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Gráficos incluidos:</strong>
+                        <ol>
+                            <li>Top 5 Productos con Mayor Stock (Barra horizontal)</li>
+                            <li>Distribución por Rango de Vencimiento (Dona)</li>
+                            <li>Productos Críticos por Línea Comercial (Barra)</li>
+                            <li>Top 5 Productos por Vencer (0-3 meses, Barra)</li>
+                            <li>Stock por Categoría (Barra)</li>
+                            <li>Stock por Línea Comercial (Barra)</li>
+                        </ol>
+                    </li>
+                    <li><strong>KPIs visibles:</strong> Total productos, Cantidad total, Unidades por vencer (0-3 meses)</li>
+                    <li><strong>Librería:</strong> Chart.js 4.4.1 + ECharts 5.4.3</li>
+                </ul>
+            </div>
+
+            <h3>3.3 Exportación de Datos</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-006</span> - <strong>Exportación a Excel con Filtros</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Descarga de datos filtrados en formato Excel (.xlsx)</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Criterios de aceptación:</strong>
+                        <ul>
+                            <li>Exporta solo los datos aplicando los filtros activos</li>
+                            <li>Nombre de archivo: inventario_YYYYMMDD_HHMMSS.xlsx</li>
+                            <li>Formato de números: separador de miles</li>
+                            <li>Límite máximo: 10,000 filas</li>
+                            <li>Descarga directa sin guardar en servidor</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> pandas + openpyxl, endpoints /export/excel y /export/excel/exportacion</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-007</span> - <strong>Exportación Dashboard a PDF (Opcional)</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Captura de pantalla del dashboard completo en PDF</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-low">BAJA</span></li>
+                    <li><strong>Implementación:</strong> html2canvas + jsPDF (frontend)</li>
+                </ul>
+            </div>
+
+            <h3>3.4 Analytics del Sistema</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-008</span> - <strong>Monitoreo de Visitas de Usuario</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Sistema de analytics que registra navegación de usuarios</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-medium">MEDIA</span></li>
+                    <li><strong>Datos capturados:</strong>
+                        <ul>
+                            <li>Email del usuario</li>
+                            <li>Nombre completo</li>
+                            <li>URL visitada</li>
+                            <li>Timestamp (timezone America/Lima)</li>
+                            <li>IP address</li>
+                            <li>User agent</li>
+                            <li>Referrer</li>
+                        </ul>
+                    </li>
+                    <li><strong>Almacenamiento:</strong> Supabase PostgreSQL (producción) / SQLite (desarrollo)</li>
+                    <li><strong>Acceso:</strong> Solo administradores vía /analytics</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-009</span> - <strong>Dashboard de Analytics</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Visualización de métricas de uso del sistema</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-medium">MEDIA</span></li>
+                    <li><strong>Métricas mostradas:</strong>
+                        <ul>
+                            <li>Total de visitas (últimos 30 días)</li>
+                            <li>Usuarios únicos</li>
+                            <li>Visitas por usuario (top 20)</li>
+                            <li>Páginas más visitadas</li>
+                            <li>Visitas por día (gráfico de serie temporal)</li>
+                            <li>Visitas por hora del día</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>3.5 Integración con Odoo</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-010</span> - <strong>Conexión XML-RPC con Odoo ERP</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Integración en tiempo real con Odoo para obtener datos de stock</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Criterios de aceptación:</strong>
+                        <ul>
+                            <li>Autenticación con credenciales de Odoo</li>
+                            <li>Consultas a modelos: stock.quant, product.product, stock.location</li>
+                            <li>Timeout de conexión: 30 segundos</li>
+                            <li>3 intentos de reconexión automática</li>
+                            <li>Protección contra XML External Entity (XXE) con defusedxml</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> OdooManager en odoo_manager.py</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-011</span> - <strong>Caché de Datos del Dashboard</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Cache LRU para reducir consultas repetidas a Odoo</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-medium">MEDIA</span></li>
+                    <li><strong>Configuración:</strong> LRU cache de 32 combinaciones de filtros</li>
+                    <li><strong>TTL:</strong> 5 minutos (configurable en config.py)</li>
+                </ul>
+            </div>
+
+            <h3>3.6 Módulo de Administración de Usuarios</h3>
+
+            <div class="req-box">
+                <span class="req-id">RF-012</span> - <strong>Sistema RBAC (Role-Based Access Control)</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Sistema de control de acceso basado en roles con 4 niveles de permisos</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Roles disponibles:</strong>
+                        <ul>
+                            <li><strong>admin_full:</strong> 8 permisos (acceso completo + gestión de usuarios)</li>
+                            <li><strong>dashboard_user:</strong> 4 permisos (inventario + dashboard con exportación)</li>
+                            <li><strong>inventory_user:</strong> 2 permisos (solo inventario + exportación)</li>
+                            <li><strong>viewer:</strong> 1 permiso (solo visualización, sin exportar)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> permissions_manager.py con Supabase PostgreSQL</li>
+                    <li><strong>Estado:</strong> ✅ COMPLETADO (21-22 Abril 2026)</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-013</span> - <strong>Gestión de Usuarios (CRUD Completo)</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Interfaz web para administrar usuarios, roles y permisos</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Funcionalidades:</strong>
+                        <ul>
+                            <li><strong>Crear usuario:</strong> Formulario con validación de email @agrovetmarket.com</li>
+                            <li><strong>Editar rol:</strong> Cambio de rol con vista previa de permisos</li>
+                            <li><strong>Eliminar usuario:</strong> Soft delete (is_active=FALSE)</li>
+                            <li><strong>Reactivar usuario:</strong> Restaurar usuarios eliminados</li>
+                            <li><strong>Listar usuarios:</strong> Tabla con filtros por rol y estado</li>
+                        </ul>
+                    </li>
+                    <li><strong>Rutas implementadas:</strong>
+                        <ul>
+                            <li>/admin/users - Lista de usuarios</li>
+                            <li>/admin/users/add - Crear usuario</li>
+                            <li>/admin/users/edit/&lt;email&gt; - Editar rol</li>
+                            <li>/admin/users/delete/&lt;email&gt; - Eliminar usuario</li>
+                            <li>/admin/users/reactivate/&lt;email&gt; - Reactivar usuario</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> app.py + templates/admin/</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-014</span> - <strong>Sistema de Auditoría de Cambios</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Registro completo de todas las operaciones sobre usuarios y permisos</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Datos capturados:</strong>
+                        <ul>
+                            <li>Acción realizada (user_created, role_changed, user_deleted, user_reactivated)</li>
+                            <li>Email del usuario afectado</li>
+                            <li>Email del administrador que realizó la acción</li>
+                            <li>Detalles en formato JSONB (valores anteriores y nuevos)</li>
+                            <li>Dirección IP del administrador</li>
+                            <li>User agent del navegador</li>
+                            <li>Timestamp (timezone America/Lima)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Implementación:</strong> audit_logger.py con tabla inventario_audit_log</li>
+                    <li><strong>Acceso:</strong> /admin/audit-log (solo admin_full)</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-015</span> - <strong>Dashboard de Auditoría</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Visualización de métricas de seguridad y actividad administrativa</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-medium">MEDIA</span></li>
+                    <li><strong>Métricas mostradas:</strong>
+                        <ul>
+                            <li>Total de acciones registradas</li>
+                            <li>Acciones por tipo (user_created, role_changed, etc.)</li>
+                            <li>Actividad reciente (últimos 7 días)</li>
+                            <li>Top administradores más activos</li>
+                            <li>Historial de cambios por usuario</li>
+                        </ul>
+                    </li>
+                    <li><strong>Filtros disponibles:</strong> Por acción, por usuario, por rango de fechas</li>
+                    <li><strong>Implementación:</strong> templates/admin/audit_log.html con DataTables</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-016</span> - <strong>UI Profesional con DataTables</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Interfaz moderna y responsiva para gestión de usuarios</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-medium">MEDIA</span></li>
+                    <li><strong>Componentes visuales:</strong>
+                        <ul>
+                            <li><strong>Cards de estadísticas:</strong> Total usuarios, administradores, cambios recientes</li>
+                            <li><strong>Avatares circulares:</strong> Con inicial del email</li>
+                            <li><strong>Badges de rol:</strong> Con colores distintivos (rojo=admin, azul=dashboard, cyan=inventory, gris=viewer)</li>
+                            <li><strong>Búsqueda en tiempo real:</strong> Filtrado instantáneo de usuarios</li>
+                            <li><strong>Filtros avanzados:</strong> Por rol, por estado activo/inactivo</li>
+                            <li><strong>Confirmaciones elegantes:</strong> SweetAlert2 para acciones críticas</li>
+                            <li><strong>Paginación configurable:</strong> 10/25/50/100 registros por página</li>
+                        </ul>
+                    </li>
+                    <li><strong>Librerías:</strong> Bootstrap 5, DataTables 1.13.7, SweetAlert2 11, Bootstrap Icons 1.11</li>
+                    <li><strong>Responsive:</strong> Funcional en desktop, tablet y móvil</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RF-017</span> - <strong>Integración con Base de Datos Supabase</strong>
+                <ul>
+                    <li><strong>Descripción:</strong> Almacenamiento persistente de usuarios, roles y auditoría en Supabase PostgreSQL</li>
+                    <li><strong>Prioridad:</strong> <span class="priority-high">ALTA</span></li>
+                    <li><strong>Tablas creadas:</strong>
+                        <ul>
+                            <li><strong>inventario_user_permissions:</strong> 37 usuarios activos (2 admin_full, 6 dashboard_user, 29 viewer)</li>
+                            <li><strong>inventario_audit_log:</strong> Registro completo de auditoría</li>
+                        </ul>
+                    </li>
+                    <li><strong>Índices optimizados:</strong> Por email, role, is_active, timestamp, action</li>
+                    <li><strong>Configuración:</strong> DATABASE_URL en variables de entorno</li>
+                    <li><strong>Migración:</strong> Script SQL completado (sql/create_admin_tables.sql)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: REQUISITOS NO FUNCIONALES -->
+        <section class="section">
+            <h2>4. Requisitos No Funcionales</h2>
+
+            <h3>4.1 Seguridad (OWASP Top 10 2021)</h3>
+
+            <div class="req-box">
+                <span class="req-id">RNF-001</span> - <strong>A01:2021 - Broken Access Control</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>OAuth 2.0 obligatorio para toda autenticación</li>
+                            <li>Sistema RBAC con base de datos (inventario_user_permissions)</li>
+                            <li>Decoradores @require_auth y @require_admin en todas las rutas protegidas</li>
+                            <li>Validación granular de permisos por funcionalidad (permissions_manager)</li>
+                            <li>Auditoría completa de accesos (inventario_audit_log)</li>
+                            <li>Rate limiting: 60 requests/minuto por IP</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-002</span> - <strong>A02:2021 - Cryptographic Failures</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>HTTPS obligatorio en producción (Flask-Talisman)</li>
+                            <li>SESSION_COOKIE_SECURE=True</li>
+                            <li>SESSION_COOKIE_HTTPONLY=True</li>
+                            <li>SECRET_KEY de 32 bytes aleatorios (no hardcoded)</li>
+                            <li>Passwords de Odoo en variables de entorno, nunca en código</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-003</span> - <strong>A03:2021 - Injection (SQL & XML)</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>Queries parametrizadas en PostgreSQL (psycopg2)</li>
+                            <li>Pydantic v2 para validación de inputs en 5 endpoints</li>
+                            <li>defusedxml para protección contra XXE en XML-RPC</li>
+                            <li>Validación de ANALYTICS_TABLE_PREFIX con regex (solo [a-zA-Z0-9_])</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-004</span> - <strong>A04:2021 - Insecure Design</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>Arquitectura en capas con separación de responsabilidades</li>
+                            <li>Validación centralizada (schemas.py)</li>
+                            <li>Configuración centralizada (config.py)</li>
+                            <li>Logging estructurado sin información sensible</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-005</span> - <strong>A05:2021 - Security Misconfiguration</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>DEBUG=False en producción</li>
+                            <li>CSP (Content Security Policy) configurado con Flask-Talisman</li>
+                            <li>HSTS (HTTP Strict Transport Security) habilitado</li>
+                            <li>X-Frame-Options: DENY</li>
+                            <li>X-Content-Type-Options: nosniff</li>
+                            <li>Permissions-Policy para APIs sensibles deshabilitadas</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-006</span> - <strong>A07:2021 - Identification and Authentication Failures</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>Session fingerprinting (SHA-256 de User-Agent + IP)</li>
+                            <li>Timeout de sesión: 15 minutos de inactividad</li>
+                            <li>Keep-alive endpoint para sesiones activas (/api/keep-alive)</li>
+                            <li>Modal de advertencia a los 14 minutos</li>
+                            <li>Logout automático por expiración</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-007</span> - <strong>A09:2021 - Security Logging and Monitoring Failures</strong>
+                <ul>
+                    <li><strong>Mitigación:</strong>
+                        <ul>
+                            <li>Logging estructurado con módulo logging</li>
+                            <li>4 niveles de log: DEBUG, INFO, WARNING, ERROR</li>
+                            <li>Logs de autenticación (login exitoso/fallido)</li>
+                            <li>Logs de acceso denegado</li>
+                            <li>Analytics de visitas en base de datos persistente</li>
+                            <li>Retención de logs: 30 días</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>4.2 Rendimiento</h3>
+
+            <div class="req-box">
+                <span class="req-id">RNF-008</span> - <strong>Tiempo de Respuesta</strong>
+                <ul>
+                    <li><strong>Objetivo:</strong> < 2 segundos para el 95% de requests</li>
+                    <li><strong>Estrategias:</strong>
+                        <ul>
+                            <li>Caché LRU de datos del dashboard</li>
+                            <li>Índices en base de datos de analytics</li>
+                            <li>Paginación en queries de Odoo (1000 registros máx/batch)</li>
+                            <li>Compresión de respuestas HTTP</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-009</span> - <strong>Escalabilidad</strong>
+                <ul>
+                    <li><strong>Usuarios concurrentes:</strong> Hasta 50 simultáneos</li>
+                    <li><strong>Arquitectura:</strong> Horizontal scaling en Render</li>
+                    <li><strong>Base de datos:</strong> Connection pooler de Supabase (60 conexiones)</li>
+                </ul>
+            </div>
+
+            <h3>4.3 Disponibilidad y Confiabilidad</h3>
+
+            <div class="req-box">
+                <span class="req-id">RNF-010</span> - <strong>Uptime</strong>
+                <ul>
+                    <li><strong>Objetivo:</strong> ≥ 99% de disponibilidad mensual</li>
+                    <li><strong>Implementación:</strong>
+                        <ul>
+                            <li>Health checks de Render cada 30 segundos</li>
+                            <li>Auto-restart en caso de fallo</li>
+                            <li>Fallback a SQLite si PostgreSQL falla</li>
+                            <li>Modo degradado sin analytics si Supabase no responde</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-011</span> - <strong>Manejo de Errores</strong>
+                <ul>
+                    <li><strong>Requisitos:</strong>
+                        <ul>
+                            <li>Mensajes de error user-friendly (sin stack traces)</li>
+                            <li>Logging detallado de errores en backend</li>
+                            <li>Reintentos automáticos en conexión con Odoo (3 intentos)</li>
+                            <li>Timeouts configurables (default: 30 segundos)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>4.4 Usabilidad</h3>
+
+            <div class="req-box">
+                <span class="req-id">RNF-012</span> - <strong>Diseño Responsivo</strong>
+                <ul>
+                    <li><strong>Requisitos:</strong> Funcional en desktop, tablet y móvil</li>
+                    <li><strong>Breakpoints:</strong> Bootstrap 5 (sm: 576px, md: 768px, lg: 992px, xl: 1200px)</li>
+                    <li><strong>Testing:</strong> Chrome, Firefox, Safari, Edge</li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-013</span> - <strong>Accesibilidad</strong>
+                <ul>
+                    <li><strong>Nivel objetivo:</strong> WCAG 2.1 Nivel A</li>
+                    <li><strong>Implementación:</strong>
+                        <ul>
+                            <li>Etiquetas semánticas HTML5</li>
+                            <li>Contraste de colores ≥ 4.5:1</li>
+                            <li>Navegación por teclado</li>
+                            <li>Alt text en imágenes</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h3>4.5 Mantenibilidad</h3>
+
+            <div class="req-box">
+                <span class="req-id">RNF-014</span> - <strong>Código Documentado</strong>
+                <ul>
+                    <li><strong>Requisitos:</strong>
+                        <ul>
+                            <li>Docstrings en todas las funciones</li>
+                            <li>Comentarios inline para lógica compleja</li>
+                            <li>README.md con instalación y configuración</li>
+                            <li>PRD actualizado (este documento)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="req-box">
+                <span class="req-id">RNF-015</span> - <strong>Tests Automatizados</strong>
+                <ul>
+                    <li><strong>Cobertura objetivo:</strong> ≥ 70%</li>
+                    <li><strong>Framework:</strong> pytest</li>
+                    <li><strong>Archivos de test:</strong>
+                        <ul>
+                            <li>test_analytics_db.py</li>
+                            <li>test_app_routes.py</li>
+                            <li>test_odoo_manager.py</li>
+                            <li>test_schemas.py</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: ARQUITECTURA TÉCNICA -->
+        <section class="section">
+            <h2>5. Arquitectura Técnica</h2>
+
+            <h3>5.1 Stack Tecnológico</h3>
+
+            <div class="tech-stack">
+                <div class="tech-card">
+                    <h4>🖥️ Backend</h4>
+                    <ul>
+                        <li>Python 3.11+</li>
+                        <li>Flask 3.1.1</li>
+                        <li>Flask-Talisman 1.1.0</li>
+                        <li>Flask-Limiter 3.12</li>
+                        <li>Authlib 1.6.8</li>
+                        <li>Pydantic 2.11.7</li>
+                        <li>defusedxml 0.7.1</li>
+                        <li>psycopg2-binary 2.9.x</li>
+                        <li>pandas 2.x</li>
+                        <li>openpyxl 3.x</li>
+                        <li>pytz 2024.1</li>
+                        <li>python-dotenv 1.1.1</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>🎨 Frontend</h4>
+                    <ul>
+                        <li>Jinja2 Templates</li>
+                        <li>Bootstrap 5.3</li>
+                        <li>Bootstrap Icons 1.11</li>
+                        <li>Chart.js 4.4.1</li>
+                        <li>ECharts 5.4.3</li>
+                        <li>DataTables 1.13.7</li>
+                        <li>SweetAlert2 11</li>
+                        <li>html2canvas</li>
+                        <li>jsPDF</li>
+                        <li>CSS3 personalizado</li>
+                        <li>JavaScript ES6+</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>🔌 Integraciones</h4>
+                    <ul>
+                        <li>Odoo 14+ (XML-RPC)</li>
+                        <li>Google OAuth 2.0</li>
+                        <li>Supabase PostgreSQL</li>
+                    </ul>
+                </div>
+
+                <div class="tech-card">
+                    <h4>☁️ Infraestructura</h4>
+                    <ul>
+                        <li>Render.com (Web Service Pro)</li>
+                        <li>Supabase Pro (DB)</li>
+                        <li>GitHub (Control de versiones)</li>
+                        <li>Google Cloud (OAuth)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>5.2 Arquitectura de Capas</h3>
+
+            <div class="architecture-diagram">
+┌─────────────────────────────────────────────────┐
+│         PRESENTATION LAYER                      │
+│  ┌────────────┐  ┌──────────┐  ┌─────────────┐│
+│  │ Templates  │  │ Static   │  │ JavaScript  ││
+│  │ (Jinja2)   │  │ CSS/JS   │  │ Chart.js    ││
+│  │ +Admin UI  │  │          │  │ DataTables  ││
+│  └────────────┘  └──────────┘  └─────────────┘│
+└─────────────────────────────────────────────────┘
+                      ↕
+┌─────────────────────────────────────────────────┐
+│         BUSINESS LOGIC LAYER                    │
+│  ┌──────────────────────────────────────────┐  │
+│  │            app.py (Flask)                │  │
+│  │  • Routing (20+ endpoints)               │  │
+│  │  • Authentication (OAuth + DB)           │  │
+│  │  • Authorization (RBAC - 4 roles + 8 perms) │
+│  │  • Security Headers (Talisman)           │  │
+│  │  • Session Management                     │  │
+│  │  • Input Validation (Pydantic)           │  │
+│  └──────────────────────────────────────────┘  │
+│  ┌──────────┐ ┌──────────┐ ┌────────────────┐ │
+│  │schemas.py│ │config.py │ │logging_config  │ │
+│  └──────────┘ └──────────┘ └────────────────┘ │
+└─────────────────────────────────────────────────┘
+                      ↕
+┌─────────────────────────────────────────────────┐
+│         DATA ACCESS LAYER                       │
+│  ┌─────────────────┐ ┌──────────────────────┐  │
+│  │  OdooManager    │ │  AnalyticsDB         │  │
+│  │  • XML-RPC      │ │  • PostgreSQL        │  │
+│  │  • LRU Cache    │ │  • SQLite fallback   │  │
+│  │  • Retry Logic  │ │  • Visit Tracking    │  │
+│  └─────────────────┘ └──────────────────────┘  │
+│  ┌─────────────────────────────────────────┐   │
+│  │  PermissionsManager (NEW - v2.1)        │   │
+│  │  • RBAC System (4 roles)                │   │
+│  │  • User CRUD operations                 │   │
+│  │  • Role validation                      │   │
+│  │  • Supabase PostgreSQL backend          │   │
+│  └─────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────┐   │
+│  │  AuditLogger (NEW - v2.1)               │   │
+│  │  • Complete audit trail                 │   │
+│  │  • IP tracking + User agent             │   │
+│  │  • JSONB details storage                │   │
+│  │  • Activity statistics                  │   │
+│  └─────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────┘
+                      ↕
+┌─────────────────────────────────────────────────┐
+│         EXTERNAL SERVICES                       │
+│  ┌─────────┐  ┌──────────┐  ┌──────────────┐  │
+│  │ Odoo    │  │ Google   │  │  Supabase    │  │
+│  │ ERP     │  │ OAuth    │  │  PostgreSQL  │  │
+│  │         │  │          │  │  +Admin DB   │  │
+│  └─────────┘  └──────────┘  └──────────────┘  │
+└─────────────────────────────────────────────────┘
+            </div>
+
+            <h3>5.3 Flujo de Autenticación y Autorización (v2.2)</h3>
+            
+            <div class="code-block">
+┌──────────────────────────────────────────────────────────────────┐
+│                   FLUJO DE AUTENTICACIÓN v2.2                    │
+│              (Sistema 100% Basado en Base de Datos)              │
+└──────────────────────────────────────────────────────────────────┘
+
+1️⃣ INICIO DE SESIÓN
+   Usuario → /login → Clic "Iniciar con Google"
+                ↓
+   Redirige a Google OAuth (authlib)
+                ↓
+   Usuario autoriza en Google
+                ↓
+   Google redirige a /authorize con token
+
+2️⃣ VALIDACIÓN DE ACCESO (v2.2 - CAMBIO IMPORTANTE)
+   /authorize recibe token
+                ↓
+   Extrae: email, nombre, foto
+                ↓
+   ┌─────────────────────────────────────────────────────┐
+   │ CONSULTA BD: permissions_manager.get_user_details() │
+   │   SELECT * FROM inventario_user_permissions         │
+   │   WHERE email = ? AND is_active = true              │
+   └─────────────────────────────────────────────────────┘
+                ↓
+   ┌─────────────────────────┐
+   │ ¿Usuario encontrado Y   │
+   │ is_active = true?       │
+   └─────────────────────────┘
+        ❌ NO │        │ ✅ SÍ
+              ↓        ↓
+   Flash "Acceso     UPDATE last_login
+   Denegado"                ↓
+   Redirect /login   Crear sesión:
+                     - username
+                     - user_name
+                     - user_picture
+                     - user_role (NUEVO)
+                     - last_activity
+                              ↓
+   ┌─────────────────────────────────────────────────────┐
+   │ REDIRECCION SEGÚN PERMISOS                          │
+   │   IF user_has_permission('view_dashboard')          │
+   │      → /dashboard                                    │
+   │   ELIF user_has_permission('view_inventory')        │
+   │      → /inventory                                    │
+   │   ELSE                                               │
+   │      → Flash "Sin permisos" + /login                │
+   └─────────────────────────────────────────────────────┘
+
+3️⃣ ACCESO A RUTAS PROTEGIDAS
+   Usuario accede a ruta (ej: /dashboard)
+                ↓
+   Decorador @require_auth
+   - Verifica sesión activa
+   - Verifica last_activity < 15 min
+                ↓
+   Decorador @require_admin(permission='view_dashboard')
+   - Consulta: permissions_manager.user_has_permission()
+   - Query BD: verifica rol + permisos del usuario
+                ↓
+   ┌─────────────────────────┐
+   │ ¿Tiene permiso?         │
+   └─────────────────────────┘
+        ❌ NO │        │ ✅ SÍ
+              ↓        ↓
+   Flash "Sin     Renderiza vista
+   permisos"      + registra en
+   Redirect        audit_log
+   /dashboard
+
+4️⃣ ROLES Y PERMISOS (RBAC)
+   ┌────────────────┬──────────────────────────────────────┐
+   │ ROL            │ PERMISOS                             │
+   ├────────────────┼──────────────────────────────────────┤
+   │ admin_full     │ • view_inventory                     │
+   │                │ • export_inventory                   │
+   │                │ • view_dashboard                     │
+   │                │ • export_dashboard                   │
+   │                │ • view_analytics                     │
+   │                │ • manage_users      ← ADMIN ONLY     │
+   │                │ • view_audit_log    ← ADMIN ONLY     │
+   │                │ • system_admin      ← ADMIN ONLY     │
+   ├────────────────┼──────────────────────────────────────┤
+   │ dashboard_user │ • view_inventory                     │
+   │                │ • export_inventory                   │
+   │                │ • view_dashboard                     │
+   │                │ • export_dashboard                   │
+   ├────────────────┼──────────────────────────────────────┤
+   │ inventory_user │ • view_inventory                     │
+   │                │ • export_inventory                   │
+   ├────────────────┼──────────────────────────────────────┤
+   │ viewer         │ • view_inventory                     │
+   └────────────────┴──────────────────────────────────────┘
+
+5️⃣ AUDITORÍA (NUEVO EN v2.1)
+   Toda acción administrativa se registra en:
+   - Tabla: inventario_audit_log
+   - Campos: action, user_email, performed_by, details (JSON),
+             ip_address, user_agent, timestamp
+   
+   Acciones auditadas:
+   • user_created    • user_updated
+   • user_deleted    • user_reactivated
+   • role_changed    • permissions_modified
+
+6️⃣ GESTIÓN DE USUARIOS (UI Admin - /admin/users)
+   Solo accesible con permiso: manage_users
+   
+   Operaciones disponibles:
+   • Agregar usuario (email + rol)
+   • Editar usuario (cambiar rol)
+   • Desactivar usuario (is_active = false)
+   • Reactivar usuario (is_active = true)
+   • Ver historial completo (audit_log)
+   • Estadísticas de acceso
+
+IMPORTANTE: 
+📌 Sistema legacy (whitelist.txt/roles.json) YA NO SE USA
+📌 Todas las validaciones ahora usan PostgreSQL/Supabase
+📌 Los archivos whitelist.txt y roles.json se mantienen solo
+   por compatibilidad pero NO afectan el acceso al sistema
+            </div>
+
+            <h3>5.4 Modelo de Datos</h3>
+
+            <h4>Base de Datos: Supabase PostgreSQL (Analytics)</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Constraints</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>SERIAL</td>
+                        <td>PRIMARY KEY</td>
+                        <td>ID autoincremental</td>
+                    </tr>
+                    <tr>
+                        <td>user_email</td>
+                        <td>VARCHAR(255)</td>
+                        <td>NOT NULL, INDEXED</td>
+                        <td>Email del usuario</td>
+                    </tr>
+                    <tr>
+                        <td>user_name</td>
+                        <td>VARCHAR(255)</td>
+                        <td></td>
+                        <td>Nombre completo</td>
+                    </tr>
+                    <tr>
+                        <td>page_url</td>
+                        <td>VARCHAR(500)</td>
+                        <td>NOT NULL, INDEXED</td>
+                        <td>URL visitada</td>
+                    </tr>
+                    <tr>
+                        <td>page_title</td>
+                        <td>VARCHAR(255)</td>
+                        <td></td>
+                        <td>Título/endpoint</td>
+                    </tr>
+                    <tr>
+                        <td>visit_timestamp</td>
+                        <td>TIMESTAMP WITH TIME ZONE</td>
+                        <td>NOT NULL, INDEXED DESC</td>
+                        <td>Fecha/hora visita</td>
+                    </tr>
+                    <tr>
+                        <td>session_duration</td>
+                        <td>INTEGER</td>
+                        <td>DEFAULT 0</td>
+                        <td>Duración sesión (seg)</td>
+                    </tr>
+                    <tr>
+                        <td>ip_address</td>
+                        <td>VARCHAR(50)</td>
+                        <td></td>
+                        <td>IP del cliente</td>
+                    </tr>
+                    <tr>
+                        <td>user_agent</td>
+                        <td>TEXT</td>
+                        <td></td>
+                        <td>User agent navegador</td>
+                    </tr>
+                    <tr>
+                        <td>referrer</td>
+                        <td>VARCHAR(500)</td>
+                        <td></td>
+                        <td>URL de referencia</td>
+                    </tr>
+                    <tr>
+                        <td>method</td>
+                        <td>VARCHAR(10)</td>
+                        <td></td>
+                        <td>Método HTTP (GET/POST)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Índices:</strong></p>
+            <ul>
+                <li><code>idx_visits_user</code> en (user_email)</li>
+                <li><code>idx_visits_timestamp</code> en (visit_timestamp DESC)</li>
+                <li><code>idx_visits_page</code> en (page_url)</li>
+                <li><code>idx_visits_user_timestamp</code> compuesto en (user_email, visit_timestamp DESC)</li>
+            </ul>
+
+            <h4>Base de Datos: Supabase PostgreSQL (Admin Module - v2.1)</h4>
+
+            <h5>Tabla: inventario_user_permissions</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Constraints</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>BIGSERIAL</td>
+                        <td>PRIMARY KEY</td>
+                        <td>ID autoincremental</td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td>VARCHAR(255)</td>
+                        <td>NOT NULL UNIQUE</td>
+                        <td>Email del usuario (@agrovetmarket.com)</td>
+                    </tr>
+                    <tr>
+                        <td>role</td>
+                        <td>VARCHAR(50)</td>
+                        <td>NOT NULL</td>
+                        <td>Rol: admin_full, dashboard_user, inventory_user, viewer</td>
+                    </tr>
+                    <tr>
+                        <td>is_active</td>
+                        <td>BOOLEAN</td>
+                        <td>DEFAULT TRUE</td>
+                        <td>Estado del usuario (soft delete)</td>
+                    </tr>
+                    <tr>
+                        <td>created_at</td>
+                        <td>TIMESTAMPTZ</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Fecha de creación</td>
+                    </tr>
+                    <tr>
+                        <td>updated_at</td>
+                        <td>TIMESTAMPTZ</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Última modificación</td>
+                    </tr>
+                    <tr>
+                        <td>created_by</td>
+                        <td>VARCHAR(255)</td>
+                        <td></td>
+                        <td>Email del administrador que lo creó</td>
+                    </tr>
+                    <tr>
+                        <td>last_login</td>
+                        <td>TIMESTAMPTZ</td>
+                        <td></td>
+                        <td>Último inicio de sesión</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Índices:</strong></p>
+            <ul>
+                <li><code>idx_inv_user_email</code> en (email)</li>
+                <li><code>idx_inv_user_role</code> en (role)</li>
+                <li><code>idx_inv_user_active</code> en (is_active)</li>
+            </ul>
+
+            <h5>Tabla: inventario_audit_log</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Tipo</th>
+                        <th>Constraints</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>id</td>
+                        <td>BIGSERIAL</td>
+                        <td>PRIMARY KEY</td>
+                        <td>ID autoincremental</td>
+                    </tr>
+                    <tr>
+                        <td>action</td>
+                        <td>VARCHAR(50)</td>
+                        <td>NOT NULL</td>
+                        <td>Tipo: user_created, role_changed, user_deleted, user_reactivated</td>
+                    </tr>
+                    <tr>
+                        <td>user_email</td>
+                        <td>VARCHAR(255)</td>
+                        <td>NOT NULL</td>
+                        <td>Email del usuario afectado</td>
+                    </tr>
+                    <tr>
+                        <td>performed_by</td>
+                        <td>VARCHAR(255)</td>
+                        <td>NOT NULL</td>
+                        <td>Email del admin que realizó la acción</td>
+                    </tr>
+                    <tr>
+                        <td>details</td>
+                        <td>JSONB</td>
+                        <td></td>
+                        <td>Detalles en JSON (old_role, new_role, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>ip_address</td>
+                        <td>VARCHAR(45)</td>
+                        <td></td>
+                        <td>IP del administrador</td>
+                    </tr>
+                    <tr>
+                        <td>user_agent</td>
+                        <td>TEXT</td>
+                        <td></td>
+                        <td>User agent del navegador</td>
+                    </tr>
+                    <tr>
+                        <td>timestamp</td>
+                        <td>TIMESTAMPTZ</td>
+                        <td>DEFAULT NOW()</td>
+                        <td>Momento de la acción</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Índices:</strong></p>
+            <ul>
+                <li><code>idx_inv_audit_timestamp</code> en (timestamp DESC)</li>
+                <li><code>idx_inv_audit_action</code> en (action)</li>
+                <li><code>idx_inv_audit_user</code> en (user_email)</li>
+                <li><code>idx_inv_audit_performed_by</code> en (performed_by)</li>
+            </ul>
+
+            <p><strong>Estado actual:</strong></p>
+            <ul>
+                <li>✅ 37 usuarios activos (2 admin_full, 6 dashboard_user, 29 viewer)</li>
+                <li>✅ Migración completada el 21-22 de abril de 2026</li>
+                <li>✅ Sistema en producción</li>
+            </ul>
+
+            <h3>5.4 Endpoints de la API</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Ruta</th>
+                        <th>Descripción</th>
+                        <th>Autenticación</th>
+                        <th>Autorización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/login</td>
+                        <td>Página de login</td>
+                        <td>No</td>
+                        <td>Público</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/google-oauth</td>
+                        <td>Iniciar OAuth con Google</td>
+                        <td>No</td>
+                        <td>Público</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/authorize</td>
+                        <td>Callback OAuth</td>
+                        <td>OAuth</td>
+                        <td>Usuario registrado en BD</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/logout</td>
+                        <td>Cerrar sesión</td>
+                        <td>Sí</td>
+                        <td>Usuario autenticado</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/api/keep-alive</td>
+                        <td>Mantener sesión activa</td>
+                        <td>Sí</td>
+                        <td>Usuario autenticado</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/</td>
+                        <td>Página principal (redirect)</td>
+                        <td>Sí</td>
+                        <td>Usuario autenticado</td>
+                    </tr>
+                    <tr>
+                        <td>GET/POST</td>
+                        <td>/inventory</td>
+                        <td>Vista de inventario</td>
+                        <td>Sí</td>
+                        <td>Permiso: view_inventory</td>
+                    </tr>
+                    <tr>
+                        <td>GET/POST</td>
+                        <td>/exportacion</td>
+                        <td>Vista exportación específica</td>
+                        <td>Sí</td>
+                        <td>Permiso: view_inventory</td>
+                    </tr>
+                    <tr>
+                        <td>GET/POST</td>
+                        <td>/dashboard</td>
+                        <td>Dashboard con gráficos</td>
+                        <td>Sí</td>
+                        <td>Permiso: view_dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/analytics</td>
+                        <td>Analytics del sistema</td>
+                        <td>Sí</td>
+                        <td>Permiso: view_analytics</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/export/excel</td>
+                        <td>Exportar inventario a Excel</td>
+                        <td>Sí</td>
+                        <td>Permiso: export_inventory</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/export/excel/exportacion</td>
+                        <td>Exportar exportación a Excel</td>
+                        <td>Sí</td>
+                        <td>Permiso: export_inventory</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>GET</td>
+                        <td>/admin/users</td>
+                        <td>Lista usuarios (Admin Module)</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>GET/POST</td>
+                        <td>/admin/users/add</td>
+                        <td>Crear nuevo usuario</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>GET/POST</td>
+                        <td>/admin/users/edit/&lt;email&gt;</td>
+                        <td>Editar rol de usuario</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>POST</td>
+                        <td>/admin/users/delete/&lt;email&gt;</td>
+                        <td>Eliminar usuario (soft delete)</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>POST</td>
+                        <td>/admin/users/reactivate/&lt;email&gt;</td>
+                        <td>Reactivar usuario eliminado</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>GET</td>
+                        <td>/admin/audit-log</td>
+                        <td>Registro de auditoría</td>
+                        <td>Sí</td>
+                        <td>admin_full (manage_users)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Nota:</strong> Los endpoints marcados en azul fueron agregados en la versión 2.1 (Admin Module, abril 2026). En versión 2.2 se migró el control de acceso de whitelist a base de datos.</p>
+        </section>
+
+        <!-- SECCIÓN 6: CASOS DE USO -->
+        <section class="section">
+            <h2>6. Casos de Uso Principales</h2>
+
+            <h3>Caso de Uso 1: Login con Google OAuth</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Usuario final</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario está registrado y activo en la base de datos</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Usuario accede a /login</li>
+                            <li>Usuario hace clic en "Iniciar sesión con Google"</li>
+                            <li>Sistema redirige a Google OAuth</li>
+                            <li>Usuario autoriza en Google</li>
+                            <li>Google redirige a /authorize con token</li>
+                            <li>Sistema consulta usuario en tabla inventario_user_permissions</li>
+                            <li>Sistema valida que is_active=true</li>
+                            <li>Sistema registra último login (last_login)</li>
+                            <li>Sistema crea sesión persistente con rol del usuario</li>
+                            <li>Sistema redirige según permisos: /dashboard si tiene view_dashboard, sino /inventory</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>6a. Usuario NO registrado o inactivo → Sistema muestra mensaje "Acceso Denegado" y registra intento en audit_log</td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Usuario autenticado con sesión activa y rol asignado</td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 2: Consultar Inventario con Filtros</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Usuario estándar</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Usuario accede a /inventory</li>
+                            <li>Sistema muestra tabla con todo el inventario</li>
+                            <li>Usuario selecciona filtros (línea, categoría, ubicación)</li>
+                            <li>Usuario hace clic en "Buscar"</li>
+                            <li>Sistema valida filtros con Pydantic</li>
+                            <li>Sistema consulta datos filtrados desde Odoo</li>
+                            <li>Sistema aplica código de colores por vencimiento</li>
+                            <li>Sistema muestra tabla filtrada</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        5a. Filtros inválidos → Sistema muestra error de validación<br>
+                        6a. Odoo no responde → Sistema muestra mensaje "Error de conexión, intente más tarde"
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Tabla de inventario filtrada visible</td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 3: Ver Dashboard con KPIs</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Usuario dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado y con permiso de dashboard</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Usuario accede a /dashboard</li>
+                            <li>Sistema valida permiso de dashboard</li>
+                            <li>Sistema consulta datos de Odoo (con caché LRU)</li>
+                            <li>Sistema calcula KPIs (total productos, cantidad, vencimiento)</li>
+                            <li>Sistema genera 6 gráficos con Chart.js/ECharts</li>
+                            <li>Sistema muestra dashboard interactivo</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        2a. Usuario sin permiso → Redirect a /inventory con mensaje<br>
+                        3a. Datos en caché → Sistema muestra versión cacheada (5 min)
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Dashboard con KPIs y gráficos visible</td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 4: Exportar a Excel</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Usuario estándar</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado y ha aplicado filtros</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Usuario hace clic en "Exportar a Excel"</li>
+                            <li>Sistema valida filtros actuales</li>
+                            <li>Sistema consulta datos filtrados de Odoo (max 10k filas)</li>
+                            <li>Sistema genera archivo Excel con pandas/openpyxl</li>
+                            <li>Sistema formatea números con separador de miles</li>
+                            <li>Sistema envía archivo como descarga (inventario_YYYYMMDD_HHMMSS.xlsx)</li>
+                            <li>Navegador descarga archivo</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        3a. Más de 10k filas → Sistema muestra error "Demasiados resultados, refine filtros"<br>
+                        4a. Error generando Excel → Sistema muestra mensaje "Error al generar reporte"
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Archivo Excel descargado localmente</td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 5: Monitorear Analytics (Admin)</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Administrador</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado y con rol admin</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Admin accede a /analytics</li>
+                            <li>Sistema valida rol de admin</li>
+                            <li>Sistema consulta datos de Supabase PostgreSQL</li>
+                            <li>Sistema calcula métricas (visitas, usuarios únicos, etc.)</li>
+                            <li>Sistema genera gráficos de serie temporal</li>
+                            <li>Sistema muestra dashboard de analytics</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        2a. Usuario sin rol admin → HTTP 403 Forbidden<br>
+                        3a. Supabase no disponible → Sistema usa SQLite local (modo degradado)
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Dashboard de analytics visible</td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 6: Gestionar Usuarios y Roles (Admin Module v2.1)</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Administrador (admin_full)</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado con rol admin_full y permiso manage_users</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Admin accede a /admin/users</li>
+                            <li>Sistema valida permiso manage_users</li>
+                            <li>Sistema consulta inventario_user_permissions de Supabase</li>
+                            <li>Sistema muestra lista de usuarios con stats cards (Total, Admins, Cambios recientes)</li>
+                            <li>Admin puede filtrar por rol o buscar por email</li>
+                            <li>Admin selecciona una acción:
+                                <ul>
+                                    <li><strong>Crear usuario:</strong> Formulario con email, nombre, rol → Sistema valida @agrovetmarket.com → Sistema inserta en BD → AuditLogger registra user_created</li>
+                                    <li><strong>Editar rol:</strong> Selecciona nuevo rol con vista previa de permisos → Sistema actualiza BD → AuditLogger registra role_changed</li>
+                                    <li><strong>Eliminar:</strong> SweetAlert2 confirma → Sistema soft delete (is_active=FALSE) → AuditLogger registra user_deleted</li>
+                                    <li><strong>Reactivar:</strong> Restaurar usuario eliminado → Sistema set is_active=TRUE → AuditLogger registra user_reactivated</li>
+                                </ul>
+                            </li>
+                            <li>Sistema muestra mensaje de éxito con feedback visual</li>
+                            <li>Sistema actualiza tabla con DataTables (búsqueda en tiempo real, paginación)</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        2a. Usuario sin permiso manage_users → HTTP 403 Forbidden con mensaje "No autorizado"<br>
+                        6a. Email duplicado → Sistema muestra error "Usuario ya existe"<br>
+                        6b. Email inválido → Sistema muestra error "Debe ser @agrovetmarket.com"<br>
+                        6c. Admin intenta eliminarse a sí mismo → Sistema bloquea acción con mensaje "No puedes eliminarte a ti mismo"<br>
+                        6d. Supabase no disponible → Sistema muestra error "Error de base de datos, intente más tarde"
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>
+                        Usuario creado/modificado/eliminado en BD, auditoría registrada con IP + user agent, UI actualizada con feedback visual
+                    </td>
+                </tr>
+            </table>
+
+            <h3>Caso de Uso 7: Consultar Registro de Auditoría (Admin Module v2.1)</h3>
+            <table>
+                <tr>
+                    <td><strong>Actor:</strong></td>
+                    <td>Administrador (admin_full)</td>
+                </tr>
+                <tr>
+                    <td><strong>Precondición:</strong></td>
+                    <td>Usuario autenticado con rol admin_full y permiso manage_users</td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo principal:</strong></td>
+                    <td>
+                        <ol>
+                            <li>Admin accede a /admin/audit-log</li>
+                            <li>Sistema valida permiso manage_users</li>
+                            <li>Sistema consulta inventario_audit_log de Supabase</li>
+                            <li>Sistema muestra tabla de auditoría con DataTables (action, user_email, performed_by, timestamp, details JSONB)</li>
+                            <li>Admin puede filtrar por:
+                                <ul>
+                                    <li>Tipo de acción (user_created, role_changed, user_deleted, user_reactivated)</li>
+                                    <li>Usuario afectado (email)</li>
+                                    <li>Rango de fechas (últimos 7/30/90 días)</li>
+                                </ul>
+                            </li>
+                            <li>Admin puede expandir details JSONB para ver old_role, new_role, IP address, user agent</li>
+                            <li>Sistema muestra stats de actividad reciente (gráficos de acciones por día)</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Flujo alternativo:</strong></td>
+                    <td>
+                        2a. Usuario sin permiso manage_users → HTTP 403 Forbidden<br>
+                        3a. Supabase no disponible → Sistema muestra error "Error de conexión a auditoría"
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Postcondición:</strong></td>
+                    <td>Registro de auditoría completo visible con filtros aplicados</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- SECCIÓN 7: PLAN DE DESPLIEGUE -->
+        <section class="section">
+            <h2>7. Plan de Despliegue y Operación</h2>
+
+            <h3>7.1 Entornos</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Entorno</th>
+                        <th>Propósito</th>
+                        <th>URL</th>
+                        <th>Base de Datos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Desarrollo Local</td>
+                        <td>Desarrollo y testing inicial</td>
+                        <td>http://localhost:5000</td>
+                        <td>SQLite (analytics.db)</td>
+                    </tr>
+                    <tr>
+                        <td>Producción</td>
+                        <td>Usuarios finales</td>
+                        <td>https://inventario-stock-web.onrender.com</td>
+                        <td>Supabase Pro PostgreSQL</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>7.2 Variables de Entorno Requeridas</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Descripción</th>
+                        <th>Ejemplo</th>
+                        <th>Obligatorio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SECRET_KEY</td>
+                        <td>Clave secreta Flask (32 bytes)</td>
+                        <td>your-secret-key-here</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>ODOO_URL</td>
+                        <td>URL del servidor Odoo</td>
+                        <td>https://instance.odoo.com</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>ODOO_DB</td>
+                        <td>Nombre de la base de datos Odoo</td>
+                        <td>production-db</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>ODOO_USER</td>
+                        <td>Usuario de Odoo</td>
+                        <td>admin</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>ODOO_PASSWORD</td>
+                        <td>Contraseña de Odoo</td>
+                        <td>********</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>GOOGLE_CLIENT_ID</td>
+                        <td>OAuth Client ID de Google</td>
+                        <td>123456.apps.googleusercontent.com</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>GOOGLE_CLIENT_SECRET</td>
+                        <td>OAuth Client Secret de Google</td>
+                        <td>GOCSPX-***</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>DATABASE_URL</td>
+                        <td>URL de Supabase PostgreSQL para permisos y auditoría</td>
+                        <td>postgresql://postgres.xxx:pwd@...</td>
+                        <td>✅ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>DOWNLOAD_WHITELIST</td>
+                        <td>Lista de emails con permiso de descarga Excel (separados por coma)</td>
+                        <td>user1@email.com,user2@email.com</td>
+                        <td>❌ Opcional (Legacy)</td>
+                    </tr>
+                    <tr>
+                        <td>ANALYTICS_TABLE_PREFIX</td>
+                        <td>Prefijo para tablas de analytics</td>
+                        <td>inv_</td>
+                        <td>❌ Opcional</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>7.3 Proceso de Despliegue en Render</h3>
+
+            <ol>
+                <li><strong>Preparación:</strong> Push de código a GitHub rama main</li>
+                <li><strong>Configuración Render:</strong>
+                    <ul>
+                        <li>Tipo de servicio: Web Service</li>
+                        <li>Plan: Starter ($7/mes) o Pro</li>
+                        <li>Build Command: <code>pip install -r requirements.txt</code></li>
+                        <li>Start Command: <code>gunicorn app:app</code></li>
+                        <li>Python Version: 3.11</li>
+                    </ul>
+                </li>
+                <li><strong>Variables de Entorno:</strong> Configurar todas las variables requeridas en Render Dashboard</li>
+                <li><strong>Deploy:</strong> Auto-deploy desde GitHub main branch</li>
+                <li><strong>Health Check:</strong> Render verifica endpoint raíz cada 30 segundos</li>
+                <li><strong>Monitoreo:</strong> Revisar logs en Render Dashboard</li>
+            </ol>
+
+            <h3>7.4 Procedimientos de Mantenimiento</h3>
+
+            <h4>Backup de Base de Datos</h4>
+            <pre><code>pg_dump -h [SUPABASE_HOST] -U postgres.[REF] -p 6543 -d postgres 
+        -t page_visits -t inventario_user_permissions -t inventario_audit_log
+        --no-owner --no-acl -f backup_$(date +%Y%m%d).sql</code></pre>
+
+            <h4>Gestionar Usuarios</h4>
+            <ol>
+                <li>Acceder a <code>/admin/users</code> (requiere permiso manage_users)</li>
+                <li>Agregar usuario: Botón "Agregar Usuario" → Ingresar email y seleccionar rol</li>
+                <li>Editar usuario: Botón "Editar" → Cambiar rol o permisos</li>
+                <li>Desactivar usuario: Botón "Eliminar" → Usuario se marca como inactivo (is_active=false)</li>
+                <li>Ver historial: Botón "Historial de Cambios" → Todos los cambios en audit_log</li>
+            </ol>
+
+            <h4>Actualizar Roles y Permisos (Legacy)</h4>
+            <p><strong>NOTA:</strong> Este sistema es legacy y será removido. Usar módulo Admin de usuarios.</p>
+            <ol>
+                <li>Editar archivo <code>roles.json</code> (ya no recomendado)</li>
+                <li>Commit y push a GitHub</li>
+                <li>Render auto-redeploy</li>
+            </ol>
+
+            <h4>Rotación de SECRET_KEY</h4>
+            <ol>
+                <li>Generar nueva clave: <code>python -c "import secrets; print(secrets.token_hex(32))"</code></li>
+                <li>Actualizar variable <code>SECRET_KEY</code> en Render</li>
+                <li>⚠️ Todas las sesiones activas se invalidarán</li>
+            </ol>
+        </section>
+
+        <!-- SECCIÓN 8: HISTORIAL DE VERSIONES -->
+        <section class="section">
+            <h2>8. Historial de Versiones</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Versión</th>
+                        <th>Fecha</th>
+                        <th>Cambios Principales</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.0</td>
+                        <td>Marzo 2026</td>
+                        <td>
+                            • Lanzamiento inicial<br>
+                            • Autenticación Google OAuth<br>
+                            • Vista de inventario básica<br>
+                            • Exportación a Excel
+                        </td>
+                        <td>✅ Completado</td>
+                    </tr>
+                    <tr>
+                        <td>1.5</td>
+                        <td>Marzo 2026</td>
+                        <td>
+                            • Dashboard con 6 gráficos<br>
+                            • Sistema de analytics<br>
+                            • Integración Supabase PostgreSQL<br>
+                            • Migración a Pydantic v2
+                        </td>
+                        <td>✅ Completado</td>
+                    </tr>
+                    <tr>
+                        <td>2.0</td>
+                        <td>Marzo 2026</td>
+                        <td>
+                            • Session fingerprinting (anti-hijacking)<br>
+                            • Timeout de sesión + keep-alive<br>
+                            • Flask-Talisman (CSP/HSTS)<br>
+                            • Roles externalizados (roles.json)<br>
+                            • Logging estructurado sin print()<br>
+                            • Configuración centralizada (config.py)<br>
+                            • Suite de tests completa (pytest)
+                        </td>
+                        <td>✅ Completado</td>
+                    </tr>
+                    <tr>
+                        <td>2.1</td>
+                        <td>Abril 2026</td>
+                        <td>
+                            • Migración a Supabase Pro<br>
+                            • Optimización de índices DB<br>
+                            • PRD completo (este documento)
+                        </td>
+                        <td>🟡 En progreso</td>
+                    </tr>
+                    <tr>
+                        <td>2.1</td>
+                        <td>21-22 Abril 2026</td>
+                        <td>
+                            • ✅ Módulo de administración de usuarios<br>
+                            • ✅ Sistema RBAC con 4 roles<br>
+                            • ✅ Auditoría completa de cambios<br>
+                            • ✅ UI profesional con DataTables<br>
+                            • ✅ Integración Supabase PostgreSQL
+                        </td>
+                        <td>✅ Completado</td>
+                    </tr>
+                    <tr>
+                        <td>3.0</td>
+                        <td>Futuro</td>
+                        <td>
+                            • Sistema de notificaciones<br>
+                            • API REST pública<br>
+                            • Mobile app (React Native)
+                        </td>
+                        <td>📋 Planificado</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SECCIÓN 9: RIESGOS Y MITIGACIONES -->
+        <section class="section">
+            <h2>9. Riesgos y Mitigaciones</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Riesgo</th>
+                        <th>Probabilidad</th>
+                        <th>Impacto</th>
+                        <th>Mitigación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Odoo XML-RPC no disponible</td>
+                        <td>Media</td>
+                        <td>Alto</td>
+                        <td>
+                            • Timeout de 30 segundos<br>
+                            • 3 reintentos automáticos<br>
+                            • Mensaje de error user-friendly<br>
+                            • Monitoreo de logs
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Supabase PostgreSQL caído</td>
+                        <td>Baja</td>
+                        <td>Medio</td>
+                        <td>
+                            • Fallback automático a SQLite local<br>
+                            • Modo degradado (sin analytics)<br>
+                            • SLA 99.9% de Supabase Pro
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Usuarios no autorizados intentan acceder</td>
+                        <td>Alta</td>
+                        <td>Alto</td>
+                        <td>
+                            • Whitelist estricta<br>
+                            • OAuth obligatorio<br>
+                            • Logging de intentos fallidos<br>
+                            • Rate limiting (60 req/min)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Session hijacking</td>
+                        <td>Baja</td>
+                        <td>Alto</td>
+                        <td>
+                            • Session fingerprinting SHA-256<br>
+                            • Cookies SECURE + HTTPONLY<br>
+                            • Timeout de 15 min<br>
+                            • HTTPS obligatorio
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Datos sensibles en logs</td>
+                        <td>Media</td>
+                        <td>Alto</td>
+                        <td>
+                            • Logging estructurado sin includes<br>
+                            • Sanitización de logs<br>
+                            • Revisión periódica de logs<br>
+                            • Retención de 30 días
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Render downtime</td>
+                        <td>Baja</td>
+                        <td>Alto</td>
+                        <td>
+                            • SLA 99.95% de Render Pro<br>
+                            • Health checks automáticos<br>
+                            • Auto-restart en fallos<br>
+                            • Backup de código en GitHub
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Cambios en API de Odoo</td>
+                        <td>Baja</td>
+                        <td>Medio</td>
+                        <td>
+                            • Versionamiento de API (XML-RPC v2)<br>
+                            • Tests de integración<br>
+                            • Documentación de dependencias<br>
+                            • Contacto con equipo de Odoo
+                        </td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>Modificación no autorizada de usuarios/roles</td>
+                        <td>Baja</td>
+                        <td>Alto</td>
+                        <td>
+                            • Sistema RBAC estricto (solo admin_full)<br>
+                            • Auditoría completa con IP tracking<br>
+                            • Prevención de auto-eliminación<br>
+                            • Soft delete para recuperación<br>
+                            • Logging de todas las operaciones
+                        </td>
+                    </tr>
+                    <tr style="background-color: #e7f3ff;">
+                        <td>Pérdida de trazabilidad en cambios de permisos</td>
+                        <td>Baja</td>
+                        <td>Medio</td>
+                        <td>
+                            • AuditLogger con JSONB details<br>
+                            • Retención permanente de auditoría<br>
+                            • Filtros avanzados en audit log<br>
+                            • Timestamps con timezone (America/Lima)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Nota:</strong> Los riesgos marcados en azul fueron agregados en la versión 2.1 (Admin Module, abril 2026). En versión 2.2 se eliminó dependencia de archivos planos (whitelist.txt/roles.json).</p>
+        </section>
+
+        <!-- SECCIÓN 10: ROADMAP -->
+        <section class="section">
+            <h2>10. Roadmap Futuro</h2>
+
+            <h3>Q2 2026 (Abril - Junio)</h3>
+            <ul>
+                <li>✅ <strong>Migración a Supabase Pro</strong> (8 Abril) - COMPLETADO</li>
+                <li>✅ <strong>Módulo de administración de usuarios</strong> (21-22 Abril) - COMPLETADO</li>
+                <li>🔲 <strong>Optimización de queries</strong> - Reducir tiempos de carga</li>
+                <li>🔲 <strong>Dashboard personalizable</strong> - Permitir usuarios elegir gráficos</li>
+                <li>🔲 <strong>Exportación programada</strong> - Reportes automáticos por email</li>
+            </ul>
+
+            <h3>Q3 2026 (Julio - Septiembre)</h3>
+            <ul>
+                <li>🔲 <strong>Sistema de notificaciones</strong> - Alertas de productos próximos a vencer</li>
+                <li>🔲 <strong>Multi-idioma</strong> - Soporte para inglés y español</li>
+                <li>🔲 <strong>Dark mode</strong> - Tema oscuro opcional</li>
+            </ul>
+
+            <h3>Q4 2026 (Octubre - Diciembre)</h3>
+            <ul>
+                <li>🔲 <strong>API REST pública</strong> - Para integraciones de terceros</li>
+                <li>🔲 <strong>Webhooks</strong> - Notificaciones en tiempo real</li>
+                <li>🔲 <strong>Dashboard avanzado</strong> - Análisis predictivo con ML</li>
+                <li>🔲 <strong>Mobile app (MVP)</strong> - React Native para iOS/Android</li>
+            </ul>
+
+            <h3>2027</h3>
+            <ul>
+                <li>🔲 <strong>Multi-tenancy</strong> - Soporte para múltiples empresas</li>
+                <li>🔲 <strong>Blockchain tracking</strong> - Trazabilidad inmutable de productos</li>
+                <li>🔲 <strong>AI Assistant</strong> - Chatbot con OpenAI para consultas</li>
+                <li>🔲 <strong>Microservicios</strong> - Migración a arquitectura distribuida</li>
+            </ul>
+        </section>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p><strong>Documento PRD - Sistema de Inventario Stock Web</strong></p>
+            <p>Versión 2.2 | Actualizado: 22 de abril de 2026</p>
+            <p><strong>Cambios versión 2.2:</strong> Migración completa de whitelist.txt/roles.json a sistema de permisos basado en base de datos PostgreSQL (Supabase). Todas las validaciones de acceso ahora usan permissions_manager con tabla inventario_user_permissions.</p>
+            <p>© 2026 Agrovet Market. Documento confidencial - Uso interno únicamente.</p>
+            <p>Autor: Jonathan Cerda | Contacto: jonathan.cerda@agrovetmarket.com</p>
+        </div>
+    </div>
+</body>
+</html>

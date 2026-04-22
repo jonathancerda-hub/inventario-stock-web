@@ -1,0 +1,319 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Historial de Auditoría - Admin{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-start: #667eea;
+        --primary-end: #764ba2;
+        --danger-start: #fc8181;
+        --danger-end: #f56565;
+        --warning-start: #f6ad55;
+        --warning-end: #ed8936;
+        --success-start: #68d391;
+        --success-end: #48bb78;
+        --gray-900: #2d3748;
+        --gray-700: #4a5568;
+        --gray-600: #718096;
+        --gray-500: #a0aec0;
+        --gray-400: #cbd5e0;
+        --gray-300: #e2e8f0;
+        --gray-200: #edf2f7;
+        --gray-100: #f7fafc;
+    }
+
+    body { overflow: auto !important; height: auto !important; background: var(--gray-100); font-family: "Segoe UI", system-ui, sans-serif; padding: 0; margin: 0; }
+    main { height: auto !important; min-height: 100vh; display: block !important; }
+
+    .container-main { max-width: 95%; margin: 20px auto 40px; padding: 24px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+    .header-title { font-size: 24px; font-weight: 600; color: var(--gray-900); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+    .header-title i { font-size: 28px; color: var(--gray-700); }
+    .header-subtitle { font-size: 14px; color: var(--gray-600); margin: 0 0 20px; }
+
+    .btn-outline-custom { background: white; border: 1px solid var(--gray-300); color: var(--gray-700); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-outline-custom:hover { background: var(--gray-100); border-color: var(--gray-400); color: var(--gray-900); }
+
+    .stats-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+    .stat-card { background: white; border: 1px solid var(--gray-300); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,0.1); border-color: var(--gray-400); }
+    .stat-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-icon i { font-size: 24px; color: white; }
+    .stat-icon-primary { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); }
+    .stat-icon-success { background: linear-gradient(135deg, var(--success-start), var(--success-end)); }
+    .stat-icon-warning { background: linear-gradient(135deg, var(--warning-start), var(--warning-end)); }
+    .stat-icon-danger  { background: linear-gradient(135deg, var(--danger-start),  var(--danger-end)); }
+    .stat-number { font-size: 30px; font-weight: 700; color: var(--gray-900); line-height: 1; margin-bottom: 4px; }
+    .stat-label  { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+
+    .filters-card { background: white; border: 1px solid var(--gray-300); border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .filters-title { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .filters-grid { display: grid; grid-template-columns: 1fr 1fr auto auto auto; gap: 12px; align-items: end; }
+    .filter-group label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+    .filter-select, .filter-input { width: 100%; padding: 10px 14px; border: 1px solid var(--gray-300); border-radius: 8px; font-size: 14px; color: var(--gray-700); background: white; transition: all 0.2s; }
+    .filter-select:focus, .filter-input:focus { outline: none; border-color: var(--primary-start); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .btn-filter { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
+    .btn-filter-apply { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; box-shadow: 0 3px 6px rgba(102,126,234,0.3); }
+    .btn-filter-apply:hover { transform: translateY(-1px); box-shadow: 0 5px 10px rgba(102,126,234,0.4); }
+    .btn-filter-clear { background: white; color: var(--gray-700); border: 1px solid var(--gray-300) !important; }
+    .btn-filter-clear:hover { background: var(--gray-100); }
+
+    .section-title { font-size: 18px; font-weight: 600; color: var(--gray-900); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+    .table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 650px; border-radius: 12px; border: 1px solid var(--gray-300); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .table-wrapper::-webkit-scrollbar { width: 7px; height: 7px; }
+    .table-wrapper::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 4px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: var(--gray-400); border-radius: 4px; }
+    .table-wrapper::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+
+    .audit-table { width: 100%; min-width: 900px; margin-bottom: 0; border-collapse: collapse; }
+    .audit-table thead { background: linear-gradient(135deg, var(--gray-100), var(--gray-200)); }
+    .audit-table thead th { padding: 14px 18px; font-size: 11px; font-weight: 700; color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--gray-300); position: sticky; top: 0; background: linear-gradient(135deg, var(--gray-100), var(--gray-200)); z-index: 10; white-space: nowrap; }
+    .audit-table tbody td { padding: 14px 18px; vertical-align: middle; border-bottom: 1px solid var(--gray-200); font-size: 13px; color: var(--gray-700); }
+    .audit-table tbody tr:hover { background: var(--gray-100); }
+    .audit-table tbody tr:last-child td { border-bottom: none; }
+
+    .log-date { font-size: 13px; font-weight: 500; color: var(--gray-900); white-space: nowrap; }
+    .log-time { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+
+    .action-badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .action-created     { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
+    .action-updated     { background: #ebf8ff; color: #2a69ac; border: 1px solid #bee3f8; }
+    .action-deleted     { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+    .action-reactivated { background: #faf5ff; color: #6b46c1; border: 1px solid #e9d8fd; }
+    .action-login       { background: var(--gray-200); color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .action-default     { background: var(--gray-200); color: var(--gray-600); border: 1px solid var(--gray-300); }
+
+    .user-avatar-sm { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; text-transform: uppercase; flex-shrink: 0; }
+    .user-cell { display: flex; align-items: center; gap: 10px; }
+    .user-email-text { font-size: 13px; color: var(--gray-900); font-weight: 500; }
+
+    .role-badge { background: var(--gray-200); color: var(--gray-700); padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: 500; }
+    .role-badge.role-admin { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; }
+
+    .btn-details { background: white; border: 1px solid var(--gray-300); color: var(--gray-600); padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-details:hover { background: var(--gray-100); border-color: var(--primary-start); color: var(--primary-start); }
+
+    .ip-text { font-size: 12px; color: var(--gray-500); font-family: monospace; }
+    .empty-state { padding: 60px 20px; text-align: center; }
+    .empty-state i { font-size: 48px; color: var(--gray-400); margin-bottom: 16px; display: block; }
+    .empty-state p { color: var(--gray-500); font-size: 15px; margin: 0; }
+
+    @media (max-width: 1023px) {
+        .stats-container { grid-template-columns: repeat(2, 1fr); }
+        .filters-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 767px) {
+        .stats-container { grid-template-columns: 1fr 1fr; }
+        .filters-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="container-main">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-start flex-wrap" style="gap:16px; margin-bottom:24px;">
+        <div>
+            <h1 class="header-title">
+                <i class="bi bi-clock-history"></i>
+                Historial de Auditoría
+            </h1>
+            <p class="header-subtitle">Registro completo de cambios en permisos y usuarios</p>
+        </div>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ url_for('admin_users') }}" class="btn-outline-custom">
+                <i class="bi bi-people-fill"></i>
+                Gestión de Usuarios
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn-outline-custom">
+                <i class="bi bi-arrow-left"></i>
+                Volver al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-primary"><i class="bi bi-activity"></i></div>
+            <div>
+                <div class="stat-number">{{ stats.total_actions }}</div>
+                <div class="stat-label">Acciones (últimos {{ days_back }} días)</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-success"><i class="bi bi-person-plus-fill"></i></div>
+            <div>
+                <div class="stat-number">{{ stats.by_action.get('user_created', 0) }}</div>
+                <div class="stat-label">Usuarios Creados</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-warning"><i class="bi bi-arrow-left-right"></i></div>
+            <div>
+                <div class="stat-number">{{ stats.by_action.get('role_changed', 0) }}</div>
+                <div class="stat-label">Roles Modificados</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-danger"><i class="bi bi-person-dash-fill"></i></div>
+            <div>
+                <div class="stat-number">{{ stats.by_action.get('user_deleted', 0) }}</div>
+                <div class="stat-label">Usuarios Desactivados</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-card">
+        <div class="filters-title"><i class="bi bi-funnel-fill"></i> Filtros</div>
+        <form method="get">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Tipo de Acción</label>
+                    <select name="action" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Todas las acciones</option>
+                        {% for action_type in action_types %}
+                        <option value="{{ action_type }}" {% if current_action_filter == action_type %}selected{% endif %}>
+                            {{ action_type.replace('_', ' ').title() }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Usuario Afectado</label>
+                    <input type="text" name="user_email" class="filter-input"
+                           placeholder="Buscar por email..."
+                           value="{{ current_user_filter or '' }}"
+                           autocomplete="off">
+                </div>
+                <div class="filter-group">
+                    <label>Período</label>
+                    <select name="days" class="filter-select" style="min-width:130px;" onchange="this.form.submit()">
+                        <option value="7"   {% if days_back == 7   %}selected{% endif %}>7 días</option>
+                        <option value="30"  {% if days_back == 30  %}selected{% endif %}>30 días</option>
+                        <option value="90"  {% if days_back == 90  %}selected{% endif %}>90 días</option>
+                        <option value="365" {% if days_back == 365 %}selected{% endif %}>1 año</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-filter btn-filter-apply">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+                <a href="{{ url_for('admin_audit_log') }}" class="btn-filter btn-filter-clear">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="section-title">
+        <i class="bi bi-table"></i>
+        Registros de Actividad
+        <span style="font-size:13px; font-weight:400; color:var(--gray-500);">({{ logs|length }} resultados)</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="audit-table" id="auditTable">
+            <thead>
+                <tr>
+                    <th>FECHA / HORA</th>
+                    <th>ACCIÓN</th>
+                    <th>USUARIO AFECTADO</th>
+                    <th>REALIZADO POR</th>
+                    <th>DETALLES</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>
+                        {% if log.timestamp %}
+                            {% set ts = log.timestamp|string %}
+                            <div class="log-date">{{ ts[:10] }}</div>
+                            <div class="log-time">{{ ts[11:19] if ts|length > 10 else '' }}</div>
+                        {% else %}
+                            <span class="log-time">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if log.action == 'user_created' %}
+                            <span class="action-badge action-created"><i class="bi bi-person-plus-fill"></i> Creado</span>
+                        {% elif log.action in ('role_changed', 'user_updated') %}
+                            <span class="action-badge action-updated"><i class="bi bi-arrow-left-right"></i> Rol Cambiado</span>
+                        {% elif log.action == 'user_deleted' %}
+                            <span class="action-badge action-deleted"><i class="bi bi-person-dash-fill"></i> Desactivado</span>
+                        {% elif log.action == 'user_reactivated' %}
+                            <span class="action-badge action-reactivated"><i class="bi bi-person-check-fill"></i> Reactivado</span>
+                        {% elif log.action == 'login' %}
+                            <span class="action-badge action-login"><i class="bi bi-box-arrow-in-right"></i> Login</span>
+                        {% else %}
+                            <span class="action-badge action-default"><i class="bi bi-dot"></i> {{ log.action }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar-sm">{{ log.user_email[0] if log.user_email else '?' }}</div>
+                            <span class="user-email-text">{{ log.user_email or '—' }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="font-size:13px; color:var(--gray-600);">{{ log.performed_by or '—' }}</span>
+                    </td>
+                    <td>
+                        {% if log.details %}
+                            {% if log.action in ('role_changed', 'user_updated') %}
+                                <span class="role-badge">{{ log.details.old_role or '?' }}</span>
+                                <i class="bi bi-arrow-right" style="font-size:11px; color:var(--gray-500); margin:0 4px;"></i>
+                                <span class="role-badge {% if log.details.new_role == 'admin_full' %}role-admin{% endif %}">{{ log.details.new_role or '?' }}</span>
+                            {% elif log.action == 'user_created' %}
+                                <span class="role-badge {% if log.details.role == 'admin_full' %}role-admin{% endif %}">{{ log.details.role or '?' }}</span>
+                            {% elif log.action == 'user_deleted' %}
+                                <span style="font-size:12px; color:var(--gray-600);">Era:</span>
+                                <span class="role-badge">{{ log.details.role_before_deletion or '?' }}</span>
+                            {% else %}
+                                <button class="btn-details" onclick="showDetails({{ log.details | tojson | e }})">
+                                    <i class="bi bi-info-circle"></i> Ver
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:var(--gray-400); font-size:13px;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="ip-text">{{ log.ip_address or '—' }}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <p>No hay registros de auditoría con los filtros aplicados</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function showDetails(details) {
+    Swal.fire({
+        title: 'Detalles Completos',
+        html: '<pre style="text-align:left; font-size:13px; background:#f7fafc; padding:12px; border-radius:8px; overflow:auto;">' + JSON.stringify(details, null, 2) + '</pre>',
+        confirmButtonText: 'Cerrar',
+        confirmButtonColor: '#667eea',
+        width: 500
+    });
+}
+</script>
+
+{% endblock %}

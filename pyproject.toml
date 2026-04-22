@@ -1,0 +1,8 @@
+[tool.bandit]
+exclude_dirs = ["tests", "venv", "__pycache__"]
+
+[tool.bandit.per_file_ignores]
+# analytics_db.py: B608 suprimido porque table_prefix es validado en __init__
+# con re.match(r'^[a-zA-Z0-9_]+$'), por lo que no es un vector de inyección real.
+# Los parámetros de datos siempre usan placeholders (%s / ?).
+"analytics_db.py" = ["B608"]

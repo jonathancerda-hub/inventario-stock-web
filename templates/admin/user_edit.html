@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuario - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Header -->
+            <div class="mb-4">
+                <h2><i class="fas fa-user-edit"></i> Editar Usuario</h2>
+                <p class="text-muted">Modifica el rol de <strong>{{ user.email }}</strong></p>
+            </div>
+
+            <!-- Información Actual -->
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-info-circle"></i> Información Actual</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Rol Actual:</strong> 
+                                <span class="badge bg-primary">{{ user.role }}</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Estado:</strong> 
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </p>
+                            <p><strong>Creado:</strong> {{ user.created_at }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Permisos Actuales -->
+                    <div class="mt-3">
+                        <strong>Permisos Actuales:</strong>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            {% for permission in user.permissions %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> {{ permission }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Edición -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('admin_edit_user', email=user.email) }}" id="editUserForm">
+                        <!-- Nuevo Rol -->
+                        <div class="mb-4">
+                            <label for="new_role" class="form-label">
+                                <i class="fas fa-user-tag"></i> Nuevo Rol *
+                            </label>
+                            <select class="form-select" id="new_role" name="new_role" required onchange="updatePermissionsComparison()">
+                                <option value="">Selecciona un nuevo rol...</option>
+                                {% for role in available_roles %}
+                                <option value="{{ role }}" {% if role == user.role %}selected{% endif %}>
+                                    {{ role }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Comparación de Permisos -->
+                        <div class="mb-4" id="permissionsComparison" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-warning">
+                                        <h6><i class="fas fa-minus-circle"></i> Se Removerán:</h6>
+                                        <div id="removedPermissions" class="mt-2"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-success">
+                                        <h6><i class="fas fa-plus-circle"></i> Se Agregarán:</h6>
+                                        <div id="addedPermissions" class="mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción de Roles -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-info-circle"></i> Descripción de Roles:</h6>
+                                <ul class="mb-0 small">
+                                    <li><strong>admin_full</strong>: Acceso completo (gestión usuarios, analytics, config)</li>
+                                    <li><strong>dashboard_user</strong>: Dashboard + inventario + exportar</li>
+                                    <li><strong>inventory_user</strong>: Solo inventario + exportar</li>
+                                    <li><strong>viewer</strong>: Solo visualizar inventario</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Advertencia de Seguridad -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-shield-alt"></i> <strong>Nota de Seguridad:</strong>
+                            El cambio de rol se registrará en el historial de auditoría con tu usuario, 
+                            dirección IP y marca de tiempo.
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Permisos por rol (desde el backend)
+const rolePermissions = {{ role_permissions | tojson }};
+const currentPermissions = {{ user.permissions | tojson }};
+const currentRole = "{{ user.role }}";
+
+// Comparar permisos al cambiar rol
+function updatePermissionsComparison() {
+    const newRole = document.getElementById('new_role').value;
+    const comparisonDiv = document.getElementById('permissionsComparison');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (!newRole || newRole === currentRole) {
+        comparisonDiv.style.display = 'none';
+        submitBtn.disabled = (newRole === currentRole);
+        return;
+    }
+    
+    const newPermissions = rolePermissions[newRole] || [];
+    
+    // Calcular diferencias
+    const removed = currentPermissions.filter(p => !newPermissions.includes(p));
+    const added = newPermissions.filter(p => !currentPermissions.includes(p));
+    
+    // Mostrar permisos removidos
+    const removedDiv = document.getElementById('removedPermissions');
+    if (removed.length > 0) {
+        removedDiv.innerHTML = '<div class="d-flex flex-wrap gap-2">' + 
+            removed.map(p => `<span class="badge bg-danger"><i class="fas fa-times"></i> ${p}</span>`).join('') +
+            '</div>';
+    } else {
+        removedDiv.innerHTML = '<small class="text-muted">Ninguno</small>';
+    }
+    
+    // Mostrar permisos agregados
+    const addedDiv = document.getElementById('addedPermissions');
+    if (added.length > 0) {
+        addedDiv.innerHTML = '<div class="d-flex flex-wrap gap-2">' + 
+            added.map(p => `<span class="badge bg-success"><i class="fas fa-plus"></i> ${p}</span>`).join('') +
+            '</div>';
+    } else {
+        addedDiv.innerHTML = '<small class="text-muted">Ninguno</small>';
+    }
+    
+    comparisonDiv.style.display = 'block';
+    submitBtn.disabled = false;
+}
+
+// Confirmación antes de enviar
+document.getElementById('editUserForm').addEventListener('submit', function(e) {
+    const newRole = document.getElementById('new_role').value;
+    
+    if (newRole === currentRole) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'info',
+            title: 'Sin cambios',
+            text: 'El rol seleccionado es el mismo que el actual'
+        });
+        return false;
+    }
+    
+    e.preventDefault();
+    Swal.fire({
+        title: '¿Confirmar cambio de rol?',
+        html: `Se cambiará el rol de <strong>{{ user.email }}</strong> de <strong>${currentRole}</strong> a <strong>${newRole}</strong>.<br><br>Este cambio se registrará en el historial de auditoría.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0d6efd',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, cambiar rol',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            e.target.submit();
+        }
+    });
+});
+
+// Inicializar comparación si ya hay un rol seleccionado
+updatePermissionsComparison();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}

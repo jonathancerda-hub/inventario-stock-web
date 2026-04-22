@@ -13,5 +13,143 @@
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    {% if session.get('username') %}
+    <!-- =====================================================================
+         Modal: Advertencia de cierre de sesión por inactividad
+         Se muestra cuando quedan SESSION_WARNING_MINUTES minutos
+    ====================================================================== -->
+    <div id="sessionWarningModal" role="dialog" aria-modal="true" aria-labelledby="sessionWarningTitle"
+         style="display:none; position:fixed; inset:0; z-index:9999;
+                background:rgba(0,0,0,0.55); align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:14px; padding:2rem 2.5rem;
+                    max-width:420px; width:90%; text-align:center;
+                    box-shadow:0 24px 64px rgba(0,0,0,0.3); font-family:'Poppins',sans-serif;">
+            <div style="font-size:2.8rem; margin-bottom:0.4rem;">⏰</div>
+            <h3 id="sessionWarningTitle"
+                style="color:#714B67; margin:0 0 0.4rem; font-size:1.2rem; font-weight:700;">
+                Sesión por vencer
+            </h3>
+            <p style="color:#666; margin:0 0 0.75rem; font-size:0.9rem;">
+                Tu sesión cerrará automáticamente por inactividad en:
+            </p>
+            <div id="sessionCountdown"
+                 style="font-size:2.8rem; font-weight:800; color:#dc3545;
+                        margin:0.25rem 0 1rem; letter-spacing:3px;">
+                2:00
+            </div>
+            <p style="color:#999; font-size:0.8rem; margin:0 0 1.5rem;">
+                Cualquier acción en la página renueva la sesión.
+            </p>
+            <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+                <button id="btnKeepAlive"
+                        style="background:#714B67; color:#fff; border:none;
+                               padding:0.55rem 1.4rem; border-radius:8px;
+                               font-size:0.9rem; cursor:pointer;
+                               font-family:'Poppins',sans-serif; font-weight:600;">
+                    <i class="bi bi-arrow-clockwise"></i> Continuar sesión
+                </button>
+                <a href="{{ url_for('logout') }}"
+                   style="background:#f1f3f5; color:#555; border:1px solid #ddd;
+                          padding:0.55rem 1.4rem; border-radius:8px;
+                          font-size:0.9rem; text-decoration:none;
+                          font-family:'Poppins',sans-serif; font-weight:500;">
+                    Cerrar sesión
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // Constantes de configuración inyectadas desde Flask
+        const TIMEOUT_MS  = {{ SESSION_TIMEOUT_MINUTES * 60 * 1000 }};  // ej. 900 000 ms
+        const WARNING_MS  = {{ SESSION_WARNING_MINUTES * 60 * 1000 }};  // ej. 120 000 ms
+        const KEEP_ALIVE  = "{{ url_for('keep_alive') }}";
+        const LOGOUT_URL  = "{{ url_for('logout') }}";
+
+        let lastActivity     = Date.now();
+        let warningShown     = false;
+        let countdownTimer   = null;
+        let checkTimer       = null;
+
+        // ── Registrar cualquier actividad del usuario ──────────────────────
+        ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (evt) {
+            document.addEventListener(evt, function () {
+                lastActivity = Date.now();
+                if (warningShown) { hideWarning(); }
+            }, { passive: true });
+        });
+
+        // ── Formatear ms → "M:SS" ──────────────────────────────────────────
+        function fmt(ms) {
+            var s = Math.max(0, Math.ceil(ms / 1000));
+            return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+        }
+
+        // ── Mostrar modal con countdown ────────────────────────────────────
+        function showWarning(remainingMs) {
+            var modal     = document.getElementById('sessionWarningModal');
+            var countdown = document.getElementById('sessionCountdown');
+            modal.style.display = 'flex';
+            warningShown = true;
+
+            var deadline = Date.now() + remainingMs;
+            countdown.textContent = fmt(remainingMs);
+
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(function () {
+                var left = deadline - Date.now();
+                countdown.textContent = fmt(left);
+                if (left <= 0) {
+                    clearInterval(countdownTimer);
+                    window.location.href = LOGOUT_URL;
+                }
+            }, 1000);
+        }
+
+        // ── Ocultar modal ──────────────────────────────────────────────────
+        function hideWarning() {
+            document.getElementById('sessionWarningModal').style.display = 'none';
+            warningShown = false;
+            clearInterval(countdownTimer);
+        }
+
+        // ── Botón "Continuar sesión" ────────────────────────────────────────
+        document.getElementById('btnKeepAlive').addEventListener('click', function () {
+            fetch(KEEP_ALIVE, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    if (data.ok) {
+                        lastActivity = Date.now();
+                        hideWarning();
+                    } else {
+                        window.location.href = LOGOUT_URL;
+                    }
+                })
+                .catch(function () { window.location.href = LOGOUT_URL; });
+        });
+
+        // ── Verificar inactividad cada 15 segundos ─────────────────────────
+        checkTimer = setInterval(function () {
+            var idle      = Date.now() - lastActivity;
+            var remaining = TIMEOUT_MS - idle;
+
+            if (remaining <= 0) {
+                clearInterval(checkTimer);
+                window.location.href = LOGOUT_URL;
+            } else if (remaining <= WARNING_MS && !warningShown) {
+                showWarning(remaining);
+            } else if (remaining > WARNING_MS && warningShown) {
+                hideWarning();
+            }
+        }, 15000);
+
+    }());
+    </script>
+    {% endif %}
+
 </body>
 </html>

@@ -1,0 +1,18 @@
+{
+  "_comment": "Control de acceso por roles. Editar este archivo para gestionar permisos sin modificar código.",
+  "_last_updated": "2026-04-15",
+  "dashboard_users": [
+    "umberto.calderon@agrovetmarket.com",
+    "sandra.meneses@agrovetmarket.com",
+    "jimena.delrisco@agrovetmarket.com",
+    "johanna.hurtado@agrovetmarket.com",
+    "ena.fernandez@agrovetmarket.com",
+    "jonathan.cerda@agrovetmarket.com",
+    "milady.alvarez@agrovetmarket.com",
+    "giovanna.anchorena@agrovetmarket.com"
+  ],
+  "admin_users": [
+    "jonathan.cerda@agrovetmarket.com",
+    "ena.fernandez@agrovetmarket.com"
+  ]
+}

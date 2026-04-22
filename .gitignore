@@ -11,6 +11,19 @@ whitelist.txt
 # Base de datos de analytics local (SQLite)
 analytics.db
 
+# Backups de base de datos (SQL dumps)
+backups/
+*.sql.backup
+backup_*.sql
+data_only.sql
+FINAL_BACKUP_*.sql
+
+# Archivos de migración temporales
+migrate_*.log
+page_visits_export.csv
+.env.new
+.env.old
+
 # Otros archivos específicos del sistema operativo o IDE
 .DS_Store
 *.pyc

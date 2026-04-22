@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Usuario - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Header -->
+            <div class="mb-4">
+                <h2><i class="fas fa-user-plus"></i> Agregar Nuevo Usuario</h2>
+                <p class="text-muted">Crea un nuevo usuario y asigna su rol en el sistema</p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('admin_add_user') }}" id="addUserForm">
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> Email Corporativo *
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   required pattern=".+@agrovetmarket\.com$"
+                                   placeholder="usuario@agrovetmarket.com">
+                            <div class="form-text">
+                                Debe ser un email corporativo (@agrovetmarket.com)
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor ingresa un email válido @agrovetmarket.com
+                            </div>
+                        </div>
+
+                        <!-- Rol -->
+                        <div class="mb-4">
+                            <label for="role" class="form-label">
+                                <i class="fas fa-user-tag"></i> Rol del Usuario *
+                            </label>
+                            <select class="form-select" id="role" name="role" required onchange="updatePermissionsPreview()">
+                                <option value="">Selecciona un rol...</option>
+                                {% for role in available_roles %}
+                                <option value="{{ role }}">{{ role }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                El rol define qué módulos y funciones puede acceder el usuario
+                            </div>
+                        </div>
+
+                        <!-- Preview de Permisos -->
+                        <div class="mb-4" id="permissionsPreview" style="display: none;">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-shield-alt"></i> Permisos Incluidos:</h6>
+                                <div id="permissionsList" class="mt-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción de Roles -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-info-circle"></i> Descripción de Roles:</h6>
+                                <ul class="mb-0">
+                                    <li><strong>admin_full</strong>: Acceso completo al sistema (gestión de usuarios, analytics, configuración)</li>
+                                    <li><strong>dashboard_user</strong>: Acceso al dashboard con KPIs y gráficos + inventario completo</li>
+                                    <li><strong>inventory_user</strong>: Solo consulta y exportación de inventario</li>
+                                    <li><strong>viewer</strong>: Solo visualización de inventario (sin exportar)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Crear Usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Permisos por rol (desde el backend)
+const rolePermissions = {{ role_permissions | tojson }};
+
+// Validación del email
+document.getElementById('email').addEventListener('input', function(e) {
+    const email = e.target.value;
+    const isValid = email.endsWith('@agrovetmarket.com');
+    
+    if (!isValid && email.length > 0) {
+        e.target.classList.add('is-invalid');
+    } else {
+        e.target.classList.remove('is-invalid');
+    }
+});
+
+// Preview de permisos al seleccionar rol
+function updatePermissionsPreview() {
+    const selectedRole = document.getElementById('role').value;
+    const previewDiv = document.getElementById('permissionsPreview');
+    const permissionsList = document.getElementById('permissionsList');
+    
+    if (selectedRole && rolePermissions[selectedRole]) {
+        const permissions = rolePermissions[selectedRole];
+        
+        // Crear badges para cada permiso
+        let html = '<div class="d-flex flex-wrap gap-2">';
+        permissions.forEach(perm => {
+            html += `<span class="badge bg-success"><i class="fas fa-check"></i> ${perm}</span>`;
+        });
+        html += '</div>';
+        
+        permissionsList.innerHTML = html;
+        previewDiv.style.display = 'block';
+    } else {
+        previewDiv.style.display = 'none';
+    }
+}
+
+// Validación del formulario
+document.getElementById('addUserForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value;
+    const role = document.getElementById('role').value;
+    
+    if (!email.endsWith('@agrovetmarket.com')) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Email inválido',
+            text: 'Solo se permiten emails corporativos @agrovetmarket.com'
+        });
+        return false;
+    }
+    
+    if (!role) {
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Rol requerido',
+            text: 'Por favor selecciona un rol para el usuario'
+        });
+        return false;
+    }
+    
+    return true;
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
