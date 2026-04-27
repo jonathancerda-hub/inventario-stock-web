@@ -17,7 +17,8 @@ class SessionConfig:
     LIFETIME: Final[timedelta] = timedelta(minutes=TIMEOUT_MINUTES)
     
     # Flags de seguridad de cookies
-    COOKIE_SECURE: Final[bool] = True  # Solo HTTPS en producción
+    import os as _os
+    COOKIE_SECURE: Final[bool] = _os.getenv('FLASK_ENV', 'development') == 'production'
     COOKIE_HTTPONLY: Final[bool] = True  # Prevenir acceso desde JavaScript
     COOKIE_SAMESITE: Final[str] = 'Lax'  # Protección contra CSRF
 

@@ -255,9 +255,9 @@ def log_page_visit() -> Optional[Response]:
     """
     # Verificar fingerprint de sesión (prevención de session hijacking)
     if 'username' in session:
-        # Generar fingerprint basado en User-Agent e IP
+        # Generar fingerprint basado solo en User-Agent (la IP puede cambiar por proxies/load balancers)
         current_fingerprint = hashlib.sha256(
-            f"{request.user_agent.string}{request.remote_addr}".encode()
+            f"{request.user_agent.string}".encode()
         ).hexdigest()
         
         stored_fingerprint = session.get('_security_fingerprint')
